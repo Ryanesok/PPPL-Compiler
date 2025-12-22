@@ -1,152 +1,69 @@
 # PPPL Compiler - Model-to-Code Generator
 
-## 📖 Deskripsi
+Compiler yang mengkonversi model xtUML (JSON) menjadi source code executable.
 
-PPPL Compiler adalah sebuah compiler yang mengkonversi model xtUML dalam format JSON menjadi kode program yang dapat dijalankan. Compiler ini dikembangkan sebagai bagian dari tugas akhir mata kuliah Perancangan dan Pengembangan Perangkat Lunak (PPPL).
+## Fitur
 
-### Fitur Utama
+- ✅ Generate Python & Java code
+- ✅ State machine compilation
+- ✅ Auto-generated CRUD methods
+- ✅ Documentation generator
+- ✅ Model analysis & validation
+- ✅ GUI interface
 
-✅ **Multi-Language Support**: Generate kode dalam Python dan Java  
-✅ **State Machine Compilation**: Mendukung state machine dengan event handling  
-✅ **Action Language Translation**: Konversi action language (OAL) ke kode executable  
-✅ **Auto-Generated Methods**: Otomatis membuat CRUD operations dan utility methods  
-✅ **Comprehensive Documentation**: Generate dokumentasi API lengkap  
-✅ **Model Analysis**: Analisis kualitas model dengan scoring system  
-✅ **Test Run Workflow**: Testing otomatis terhadap kode yang dihasilkan  
-✅ **GUI Interface**: Antarmuka grafis yang user-friendly  
+## Instalasi
 
----
-
-## 🚀 Instalasi
-
-### Prerequisites
-
-- Python 3.8 atau lebih tinggi
-- tkinter (biasanya sudah terinstall dengan Python)
-
-### Cara Menggunakan
-
-1. Clone atau download repository ini
-2. Pastikan Python sudah terinstall
-3. Jalankan compiler dengan perintah:
-
+Jalankan:
 ```bash
 python compilerModel.py
 ```
 
----
+## Cara Penggunaan
 
-## 📚 Cara Penggunaan
+**Sebelum menggunakan:** Pastikan model dalam format JSON sesuai struktur di `models/MODEL_STRUCTURE.md`
 
-### 1. Menggunakan GUI
+### Langkah-langkah:
 
-#### Langkah-langkah:
+1. **Buka** `compilerModel.py`
+2. **Import Model** - Klik "Import Model" dan pilih file `.json`
+3. **Pilih Target Language** - Python (recommended) atau Java
+4. **Compile** - Klik tombol "🚀 Compile Model"
+5. **Test Run** - Klik "Test Run" untuk verifikasi
+6. **Selesai** - Source code tersimpan di `generated_code/`
 
-1. **Buka Compiler**
-   ```bash
-   python compilerModel.py
-   ```
-
-2. **Load Model JSON**
-   - Klik tombol **"Browse Model"**
-   - Pilih file JSON model Anda
-   - Model akan divalidasi secara otomatis
-
-3. **Pilih Target Language**
-   - Pilih **Python** atau **Java** dari dropdown
-   - Python: Full support (state machines, action language, OAL)
-   - Java: Basic support (classes dan methods)
-
-4. **Opsi Tambahan**
-   - ☑ **Generate Documentation**: Membuat dokumentasi API lengkap
-   - ☑ **Enable Model Analysis**: Analisis kualitas model sebelum compile
-
-5. **Compile Model**
-   - Klik tombol **"Compile Model"**
-   - Tunggu proses kompilasi selesai
-   - Lihat output di console area
-
-6. **Test Run (Opsional)**
-   - Klik tombol **"Test Run"**
-   - Menjalankan kode yang telah di-generate
-   - Melihat hasil eksekusi dan analisis
-
-7. **Save Log**
-   - Klik **"Save Log"** untuk menyimpan hasil kompilasi
-   - File log akan disimpan dengan timestamp
-
-### 2. Struktur Output
-
-Kode yang dihasilkan akan tersimpan dalam struktur folder berikut:
+### Struktur Output
 
 ```
 generated_code/
-└── [model_name]/
-    ├── main.py                    # Entry point aplikasi
-    ├── README.md                  # Dokumentasi dasar
-    ├── library/                   # Library classes
+└── [system_name]/
+    ├── main.py
+    ├── README.md
+    ├── library/
     │   ├── __init__.py
-    │   ├── Class1.py
-    │   ├── Class2.py
-    │   └── ...
-    └── docs/                      # Dokumentasi (jika enabled)
-        └── API_DOCUMENTATION.md   # Dokumentasi API lengkap
+    │   └── *.py
+    └── docs/
+        └── API_DOCUMENTATION.md
 ```
 
----
+## Troubleshooting
 
-## 🏗️ Arsitektur Compiler
+**Gagal saat compile:**
+- Model tidak sesuai struktur → Cek `models/MODEL_STRUCTURE.md`
+- Periksa log di console compiler
 
-### Komponen Utama
+**Test run error:**
+- Model kekurangan atribut/modul → Lengkapi model JSON
+- Class tanpa state machine → Tambahkan state machine untuk active class
+
+## Arsitektur
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    GUI (compilerModel.py)                │
-└────────────────────┬────────────────────────────────────┘
-                     │
-                     ▼
-┌─────────────────────────────────────────────────────────┐
-│              Compiler Engine (compiler_engine.py)        │
-└────────────────────┬────────────────────────────────────┘
-                     │
-        ┌────────────┼────────────┬───────────────┐
-        ▼            ▼            ▼               ▼
-   ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌──────────┐
-   │ Parser  │  │ Code    │  │ State   │  │ Action   │
-   │         │  │ Gen     │  │ Machine │  │ Language │
-   └─────────┘  └─────────┘  └─────────┘  └──────────┘
-                     │
-        ┌────────────┼────────────┐
-        ▼            ▼            ▼
-   ┌─────────┐  ┌─────────┐  ┌──────────┐
-   │ Python  │  │ Java    │  │ OAL      │
-   │ Gen     │  │ Gen     │  │ Gen      │
-   └─────────┘  └─────────┘  └──────────┘
-        │            │            │
-        └────────────┴────────────┘
-                     │
-                     ▼
-   ┌──────────────────────────────────────┐
-   │     Documentation Generator          │
-   └──────────────────────────────────────┘
+GUI → Compiler Engine → Parser → Code Generator
+                              ↓
+                     Python / Java / OAL Generator
+                              ↓
+                     Documentation Generator
 ```
-
-### Modul-Modul
-
-#### 1. **parser.py**
-- Membaca dan memvalidasi file JSON model
-- Ekstraksi domains, classes, dan relationships
-- Validasi struktur model
-
-#### 2. **compiler_engine.py**
-- Orchestrator utama kompilasi
-- Koordinasi antara parser dan generator
-- Error handling
-
-#### 3. **code_generator.py**
-- Base class untuk semua generator
-- Manajemen struktur folder output
-- Abstraksi untuk multi-language support
 
 #### 4. **python_generator.py**
 - Generate kode Python dari model
@@ -230,153 +147,38 @@ Support untuk berbagai tipe action:
 | **create** | Membuat instance baru | `new_obj = ClassName()` |
 | **assign** | Assignment nilai | `self.attribute = value` |
 | **call** | Memanggil method | `object.method(params)` |
-| **generate** | Generate event | `object.handle_event('event')` |
-| **log** | Print log message | `print("message")` |
-| **transition** | State transition | `self.Status = NewState` |
 
-### 3. Auto-Generated OAL Methods
+## Modul Compiler
 
-Setiap class otomatis mendapat methods:
+- **parser.py** - Parse & validasi JSON model
+- **compiler_engine.py** - Orchestrator kompilasi
+- **python_generator.py** - Generate Python code
+- **java_generator.py** - Generate Java code
+- **state_machine_compiler.py** - Compile state machines
+- **action_language_compiler.py** - Translate action language
+- **oal_generator.py** - Generate OAL methods
+- **documentation_generator.py** - Generate docs
 
-```python
-def __str__(self):
-    """String representation"""
-    return f"ClassName(attr1={self.attr1}, attr2={self.attr2})"
+## Contoh Model
 
-def to_dict(self):
-    """Convert to dictionary"""
-    return {
-        'attr1': self.attr1,
-        'attr2': self.attr2
-    }
+Lihat folder `models/` untuk contoh:
+- `banking-system/` - Sistem perbankan
+- `e-commerce/` - Toko online
+- `blog-system/` - Platform blog
+- `personal-ai-knowledge/` - AI knowledge management
 
-def validate(self) -> bool:
-    """Validate object data"""
-    if self.required_attr is None:
-        return False
-    return True
-```
+Struktur lengkap di `models/MODEL_STRUCTURE.md`
 
-### 4. Documentation Generation
+## Credits
 
-Generate dokumentasi markdown lengkap dengan:
-- System Overview
-- Architecture Statistics
-- Domain Descriptions
-- Class Reference (attributes & methods)
-- Relationships Diagram
-- State Machine Documentation
-- API Quick Reference
-- Usage Examples
+**Kelompok 4** - PPPL UIN Sunan Kalijaga 2025
 
-### 5. Model Analysis & Scoring
+## Dokumentasi Lengkap
 
-Sistem scoring 0-100 berdasarkan:
-- **Completeness** (30%): Kelengkapan model
-- **Complexity** (20%): Kompleksitas yang sesuai
-- **Documentation** (20%): Kualitas deskripsi
-- **State Machines** (15%): Implementasi state machines
-- **Relationships** (15%): Kualitas relationships
-
-**Rating Categories:**
-- 90-100: Excellent
-- 75-89: Good
-- 60-74: Fair
-- 0-59: Needs Improvement
-
----
-
-## 🔧 Troubleshooting
-
-### Error: "Model validation failed"
-- Pastikan file JSON valid
-- Cek struktur model sesuai dokumentasi MODEL_STRUCTURE.md
-- Pastikan semua required fields ada
-
-### Error: "No classes found in model"
-- Pastikan model memiliki minimal 1 domain
-- Pastikan domain memiliki minimal 1 class
-
-### Error: "AttributeError: object has no attribute 'handle_event'"
-- Recompile model dengan versi compiler terbaru
-- Pastikan class memiliki state machine
-
-### Generated code tidak jalan
-- Cek error message di console
-- Gunakan fitur "Test Run" untuk debugging
-- Lihat Model Analysis untuk suggestions
-
----
-
-## 📊 Contoh Penggunaan
-
-### Example 1: Simple Class Model
-
-```json
-{
-  "system_name": "Simple System",
-  "domains": [{
-    "name": "Main Domain",
-    "classes": [{
-      "entity_type": "class",
-      "name": "User",
-      "attributes": [
-        {"name": "UserID", "data_type": "uuid", "attribute_type": "naming"},
-        {"name": "Name", "data_type": "string", "attribute_type": "descriptive"}
-      ]
-    }]
-  }]
-}
-```
-
-**Output**: Generate User class dengan attributes dan auto-generated methods.
-
-### Example 2: State Machine Model
-
-Lihat file `Model-personal-knowledge-ai.json` untuk contoh lengkap model dengan:
-- 6 Domains
-- 30 Classes
-- 5 State Machines
-- Multiple Relationships
-- Action Language operations
-
----
-
-## 🎓 Credits
-
-**Developed by**: Kelompok 4  
-**Course**: Perancangan dan Pengembangan Perangkat Lunak (PPPL)  
-**Institution**: UIN Sunan Kalijaga  
-**Year**: 2025  
-
----
-
-## 📄 License
-
-This project is developed for academic purposes.
-
----
-
-## 📞 Support
-
-Untuk pertanyaan atau issues, silakan refer ke dokumentasi:
-- **README.md** - Dokumentasi compiler
-- **MODEL_STRUCTURE.md** - Dokumentasi struktur model
-- **docs/API_DOCUMENTATION.md** - Dokumentasi API (generated)
-
----
-
-## 🔄 Version History
-
-### v1.0.0 (December 2025)
-- ✅ Initial release
-- ✅ Python & Java code generation
-- ✅ State machine compilation
-- ✅ Action language translation
-- ✅ Auto-generated OAL methods
-- ✅ Documentation generation
-- ✅ Model analysis & testing
-- ✅ GUI interface
+- `README.md` - Petunjuk compiler
+- `models/MODEL_STRUCTURE.md` - Format model JSON
+- `BUGFIX_SUMMARY.md` - Log bug fixes
+- `generated_code/*/docs/` - API documentation
 
 ---
 
