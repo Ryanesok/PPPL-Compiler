@@ -1,0 +1,82 @@
+{
+  "system_name": "Smart Parking System",
+  "version": "1.0.0",
+  "domains": [
+    {
+      "name": "Parking Management",
+      "key_letter": "PM",
+      "description": "Domain untuk mengelola ketersediaan slot parkir.",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "ParkingSlot",
+          "key_letter": "SLOT",
+          "description": "Representasi fisik tempat parkir",
+          "attributes": [
+            {
+              "name": "SlotID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "SlotNumber",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Available"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Available",
+            "states": [
+              {
+                "name": "Available",
+                "on_entry": [
+                  {
+                    "type": "log",
+                    "message": "Slot ${self.SlotNumber} tersedia."
+                  }
+                ]
+              },
+              {
+                "name": "Occupied",
+                "on_entry": [
+                  {
+                    "type": "log",
+                    "message": "Slot ${self.SlotNumber} terisi."
+                  }
+                ]
+              }
+            ],
+            "transitions": [
+              {
+                "from_state": "Available",
+                "to_state": "Occupied",
+                "event": "parkVehicle",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "handlePark",
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Occupied"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

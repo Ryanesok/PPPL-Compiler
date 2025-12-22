@@ -1,0 +1,114 @@
+{
+  "system_name": "Minimal Test System",
+  "domains": [
+    {
+      "name": "Test Domain",
+      "key_letter": "TD",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "EmptyClass",
+          "key_letter": "EC",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "NoAttributeTypeClass",
+          "key_letter": "NAT",
+          "attributes": [
+            {
+              "name": "TestField",
+              "data_type": "string"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "UnknownDataTypes",
+          "key_letter": "UDT",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "WeirdType",
+              "data_type": "unknown_type_xyz",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "NullType",
+              "data_type": "",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "NumericString",
+              "data_type": "123",
+              "attribute_type": "descriptive"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "StateMachineNoAttribute",
+          "key_letter": "SMN",
+          "description": "Class dengan state machine tapi tidak ada attribute Status",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Name",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Active",
+            "states": [
+              {"name": "Active"},
+              {"name": "Inactive"}
+            ],
+            "transitions": [
+              {
+                "from_state": "Active",
+                "to_state": "Inactive",
+                "event": "deactivate"
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "class",
+          "name": "EmptyStateMachine",
+          "key_letter": "ESM",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive"
+            }
+          ],
+          "state_machine": {
+            "states": [],
+            "transitions": []
+          }
+        }
+      ]
+    }
+  ]
+}

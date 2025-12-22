@@ -1,0 +1,100 @@
+Console cleared.
+Selected model: test-edge-cases (Model-test-edge-cases.json)
+--------------------------------------------------------------------------------
+Starting compilation process...
+Input: G:\Program\PPPL-Compiler\models\test-edge-cases\Model-test-edge-cases.json
+Output: G:\Program\PPPL-Compiler\generated_code
+Target Language: Python
+--------------------------------------------------------------------------------
+[INFO] Parsing model file...
+[SUCCESS] Compilation completed successfully!
+Generated 10 files:
+  - G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\library\DuplicateKeyLetter.py
+  - G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\library\ExtremeValues.py
+  - G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\library\ComplexStateMachine.py
+  - G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\library\UnknownEntityType.py
+  - G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\library\AllAttributeTypes.py
+  - G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\library\TestClass.py
+  - G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\library\__init__.py
+  - G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\main.py
+  - G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\docs\API_DOCUMENTATION.md
+  - G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\README.md
+
+[INFO] Analyzing model quality...
+======================================================================
+MODEL ANALYSIS REPORT
+======================================================================
+
+📊 MODEL STATISTICS
+----------------------------------------------------------------------
+  Domains:              3
+  Total Classes:        6
+    - Active Classes:   5
+    - Passive Classes:  1
+  State Machines:       1
+  Total States:         9
+  Total Transitions:    2
+  Total Actions:        0
+  Relationships:        0
+
+⚠️  ISSUES FOUND
+----------------------------------------------------------------------
+  1. Active class 'DuplicateKeyLetter' has no state machine
+  2. Active class 'ExtremeValues' has no state machine
+  3. Active class 'AllAttributeTypes' has no state machine
+  4. Active class 'TestClass' has no state machine
+  5. Model has no relationships defined
+
+💡 SUGGESTIONS FOR IMPROVEMENT
+----------------------------------------------------------------------
+  1. Add state machine to 'DuplicateKeyLetter' to define its behavior
+  2. Add state machine to 'ExtremeValues' to define its behavior
+  3. ComplexStateMachine: States {'', 'State_With_Underscores', 'MixedCaseState', 'UPPERCASE_STATE', '   ', 'State123WithNumbers', 'lowercase_state'} are unreachable from initial state
+  4. Add state machine to 'AllAttributeTypes' to define its behavior
+  5. Add state machine to 'TestClass' to define its behavior
+  6. Add relationships between classes to model associations
+  7. Add action language to states and transitions for executable behavior
+
+📋 OVERALL ASSESSMENT
+----------------------------------------------------------------------
+  Model Completeness Score: 55/100
+
+  ⚠️  Model needs improvement. Review issues and suggestions.
+
+======================================================================
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+🧪 TEST RUN - Executing compiled model...
+Model directory: G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system
+--------------------------------------------------------------------------------
+
+📤 EXECUTION OUTPUT:
+----------------------------------------------------------------------
+
+❌ ERRORS:
+----------------------------------------------------------------------
+  Traceback (most recent call last):
+    File "G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\main.py", line 8, in <module>
+      from library.DuplicateKeyLetter import DuplicateKeyLetter
+    File "G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\library\__init__.py", line 6, in <module>
+      from .ComplexStateMachine import ComplexStateMachine
+    File "G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\library\ComplexStateMachine.py", line 11
+      STATE-WITH-DASHES = "State-With-Dashes"
+      ^^^^^^^^^^^^^^^^^
+  SyntaxError: cannot assign to expression here. Maybe you meant '==' instead of '='?
+
+----------------------------------------------------------------------
+❌ Test run encountered errors
+
+📋 OBSERVATIONS:
+  • Errors detected: Traceback (most recent call last):
+  File "G:\Program\PPPL-Compiler\generated_code\edge_cases_test_system\main.py", line 8, in <module>
+    from library.DuplicateKeyLetter import DuplicateKeyLetter
+  
+
+💡 RECOMMENDATIONS:
+  • Fix runtime errors in generated code
+  • Output is minimal - consider adding more demonstration logic in main.py
+
+--------------------------------------------------------------------------------
+

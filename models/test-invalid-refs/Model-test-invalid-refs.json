@@ -1,0 +1,143 @@
+{
+  "system_name": "Invalid References Test",
+  "version": "1.0.0",
+  "domains": [
+    {
+      "name": "Reference Domain",
+      "key_letter": "RD",
+      "description": "Testing invalid references and relationships",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "ValidClass",
+          "key_letter": "VC",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "NonExistentClassID",
+              "data_type": "uuid",
+              "attribute_type": "referential",
+              "description": "References a class that doesn't exist"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "BrokenStateMachine",
+          "key_letter": "BSM",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "NonExistentState"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "StateA",
+            "states": [
+              {"name": "StateB"},
+              {"name": "StateC"}
+            ],
+            "transitions": [
+              {
+                "from_state": "StateA",
+                "to_state": "StateB",
+                "event": "transition1",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "transition1",
+                      "steps": [
+                        {
+                          "type": "call",
+                          "target": "NonExistentClass",
+                          "method": "someMethod",
+                          "parameters": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "StateB",
+                "to_state": "NonExistentState",
+                "event": "goToInvalid"
+              },
+              {
+                "from_state": "StateZ",
+                "to_state": "StateC",
+                "event": "fromNonExistent"
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "class",
+          "name": "CircularRef",
+          "key_letter": "CR",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "SelfReference",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "R1",
+          "type": "one_to_many",
+          "from_class": "ValidClass",
+          "to_class": "NonExistentClass",
+          "from_domain": "Reference Domain",
+          "to_domain": "Reference Domain",
+          "description": "Relationship to non-existent class"
+        },
+        {
+          "name": "R2",
+          "type": "many_to_many",
+          "from_class": "InvalidSource",
+          "to_class": "BrokenStateMachine",
+          "from_domain": "Reference Domain",
+          "to_domain": "Reference Domain",
+          "description": "From non-existent class"
+        },
+        {
+          "name": "R3",
+          "type": "one_to_one",
+          "from_class": "ValidClass",
+          "to_class": "ValidClass",
+          "from_domain": "NonExistentDomain",
+          "to_domain": "Reference Domain",
+          "description": "Invalid domain reference"
+        },
+        {
+          "name": "R4",
+          "type": "invalid_type",
+          "from_class": "CircularRef",
+          "to_class": "CircularRef",
+          "from_domain": "Reference Domain",
+          "to_domain": "Reference Domain",
+          "description": "Invalid relationship type"
+        }
+      ]
+    }
+  ]
+}

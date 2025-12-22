@@ -1,0 +1,104 @@
+Console cleared.
+--------------------------------------------------------------------------------
+Starting compilation process...
+Input: G:\Program\PPPL-Compiler\models\test-invalid-refs\Model-test-invalid-refs.json
+Output: G:\Program\PPPL-Compiler\generated_code
+Target Language: Python
+--------------------------------------------------------------------------------
+[INFO] Parsing model file...
+[SUCCESS] Compilation completed successfully!
+Generated 13 files:
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\DuplicateKeyLetter.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\ExtremeValues.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\ComplexStateMachine.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\UnknownEntityType.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\AllAttributeTypes.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\TestClass.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\ValidClass.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\BrokenStateMachine.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\CircularRef.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\__init__.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\main.py
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\docs\API_DOCUMENTATION.md
+  - G:\Program\PPPL-Compiler\generated_code\invalid_references_test\README.md
+
+[INFO] Analyzing model quality...
+======================================================================
+MODEL ANALYSIS REPORT
+======================================================================
+
+📊 MODEL STATISTICS
+----------------------------------------------------------------------
+  Domains:              1
+  Total Classes:        9
+    - Active Classes:   8
+    - Passive Classes:  1
+  State Machines:       2
+  Total States:         11
+  Total Transitions:    5
+  Total Actions:        0
+  Relationships:        1
+
+⚠️  ISSUES FOUND
+----------------------------------------------------------------------
+  1. Active class 'DuplicateKeyLetter' has no state machine
+  2. Active class 'ExtremeValues' has no state machine
+  3. Active class 'AllAttributeTypes' has no state machine
+  4. Active class 'TestClass' has no state machine
+  5. Active class 'ValidClass' has no state machine
+  6. Active class 'CircularRef' has no state machine
+
+💡 SUGGESTIONS FOR IMPROVEMENT
+----------------------------------------------------------------------
+  1. Add state machine to 'DuplicateKeyLetter' to define its behavior
+  2. Add state machine to 'ExtremeValues' to define its behavior
+  3. ComplexStateMachine: States {'', 'State_With_Underscores', 'MixedCaseState', 'UPPERCASE_STATE', '   ', 'State123WithNumbers', 'lowercase_state'} are unreachable from initial state
+  4. Add state machine to 'AllAttributeTypes' to define its behavior
+  5. Add state machine to 'TestClass' to define its behavior
+  6. Add state machine to 'ValidClass' to define its behavior
+  7. Add state machine to 'CircularRef' to define its behavior
+  8. Add action language to states and transitions for executable behavior
+
+📋 OVERALL ASSESSMENT
+----------------------------------------------------------------------
+  Model Completeness Score: 65/100
+
+  ✔️  Good model. Consider addressing suggestions for improvement.
+
+======================================================================
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+🧪 TEST RUN - Executing compiled model...
+Model directory: G:\Program\PPPL-Compiler\generated_code\invalid_references_test
+--------------------------------------------------------------------------------
+
+📤 EXECUTION OUTPUT:
+----------------------------------------------------------------------
+
+❌ ERRORS:
+----------------------------------------------------------------------
+  Traceback (most recent call last):
+    File "G:\Program\PPPL-Compiler\generated_code\invalid_references_test\main.py", line 8, in <module>
+      from library.DuplicateKeyLetter import DuplicateKeyLetter
+    File "G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\__init__.py", line 6, in <module>
+      from .ComplexStateMachine import ComplexStateMachine
+    File "G:\Program\PPPL-Compiler\generated_code\invalid_references_test\library\ComplexStateMachine.py", line 11
+      STATE-WITH-DASHES = "State-With-Dashes"
+      ^^^^^^^^^^^^^^^^^
+  SyntaxError: cannot assign to expression here. Maybe you meant '==' instead of '='?
+
+----------------------------------------------------------------------
+❌ Test run encountered errors
+
+📋 OBSERVATIONS:
+  • Errors detected: Traceback (most recent call last):
+  File "G:\Program\PPPL-Compiler\generated_code\invalid_references_test\main.py", line 8, in <module>
+    from library.DuplicateKeyLetter import DuplicateKeyLetter
+ 
+
+💡 RECOMMENDATIONS:
+  • Fix runtime errors in generated code
+  • Output is minimal - consider adding more demonstration logic in main.py
+
+--------------------------------------------------------------------------------
+

@@ -1,0 +1,262 @@
+{
+  "system_name": "Edge Cases Test System",
+  "version": "1.0.0",
+  "domains": [
+    {
+      "name": "Edge Case Domain",
+      "key_letter": "EC",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "SpecialCharacters",
+          "key_letter": "SC",
+          "description": "Class with special chars: @#$%^&*()[]{}",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Field-With-Dashes",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Field_With_Underscores",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Field With Spaces",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Field.With.Dots",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "123NumericStart",
+              "data_type": "integer",
+              "attribute_type": "descriptive"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "ExtremeValues",
+          "key_letter": "EV",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "VeryLongFieldNameThatExceedsNormalLengthLimitAndKeepsGoingAndGoingUntilItBecomesRidiculouslyLongForTestingPurposes",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "EmptyDefault",
+              "data_type": "string",
+              "attribute_type": "descriptive",
+              "default_value": ""
+            },
+            {
+              "name": "ZeroDefault",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "0"
+            },
+            {
+              "name": "NegativeDefault",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "-999"
+            },
+            {
+              "name": "LargeNumber",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "99999999999999"
+            },
+            {
+              "name": "SpecialStringChars",
+              "data_type": "string",
+              "attribute_type": "descriptive",
+              "default_value": "Test\"with'quotes"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "ComplexStateMachine",
+          "key_letter": "CSM",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Initial State With Spaces"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Initial State With Spaces",
+            "states": [
+              {"name": "Initial State With Spaces"},
+              {"name": "State-With-Dashes"},
+              {"name": "State_With_Underscores"},
+              {"name": "UPPERCASE_STATE"},
+              {"name": "lowercase_state"},
+              {"name": "MixedCaseState"},
+              {"name": "State123WithNumbers"},
+              {"name": ""},
+              {"name": "   "}
+            ],
+            "transitions": [
+              {
+                "from_state": "Initial State With Spaces",
+                "to_state": "State-With-Dashes",
+                "event": "event with spaces",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "event with spaces",
+                      "parameters": [
+                        {"name": "param-with-dash", "type": "string"},
+                        {"name": "param with space", "type": "integer"}
+                      ],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Message with \"quotes\" and 'apostrophes'"
+                        },
+                        {
+                          "type": "assign",
+                          "target": "self",
+                          "attribute": "NonExistentAttribute",
+                          "value": "test"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "State-With-Dashes",
+                "to_state": "State-With-Dashes",
+                "event": "selfLoop",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "selfLoop",
+                      "steps": [
+                        {
+                          "type": "unknown_action_type",
+                          "data": "testing unknown action"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "unknown_entity_type",
+          "name": "UnknownEntityType",
+          "key_letter": "UET",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "DuplicateKeyLetter",
+          "key_letter": "SC",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "AllAttributeTypes",
+          "key_letter": "AAT",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Naming1",
+              "data_type": "string",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Naming2",
+              "data_type": "integer",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Ref1",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "Ref2",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "InvalidAttrType",
+              "data_type": "string",
+              "attribute_type": "unknown_type"
+            }
+          ]
+        }
+      ],
+      "relationships": []
+    },
+    {
+      "name": "Empty Domain",
+      "key_letter": "ED",
+      "classes": []
+    },
+    {
+      "name": "Domain With Same Key",
+      "key_letter": "EC",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "TestClass",
+          "key_letter": "TC",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

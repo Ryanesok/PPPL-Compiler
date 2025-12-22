@@ -1,0 +1,156 @@
+{
+  "system_name": "Todo Application",
+  "version": "1.0.0",
+  "domains": [
+    {
+      "name": "Task Management",
+      "key_letter": "TM",
+      "description": "Domain untuk mengelola task dan todo items",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "Task",
+          "key_letter": "TSK",
+          "description": "Representasi task dalam sistem todo",
+          "attributes": [
+            {
+              "name": "TaskID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Title",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Description",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Priority",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "0"
+            },
+            {
+              "name": "DueDate",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "IsCompleted",
+              "data_type": "boolean",
+              "attribute_type": "descriptive",
+              "default_value": "false"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Todo"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Todo",
+            "states": [
+              {
+                "name": "Todo",
+                "on_entry": [
+                  {
+                    "type": "log",
+                    "message": "Task created"
+                  }
+                ]
+              },
+              {
+                "name": "InProgress",
+                "on_entry": [
+                  {
+                    "type": "log",
+                    "message": "Task started"
+                  }
+                ]
+              },
+              {
+                "name": "Done",
+                "on_entry": [
+                  {
+                    "type": "assign",
+                    "target": "self",
+                    "attribute": "IsCompleted",
+                    "value": "true"
+                  },
+                  {
+                    "type": "log",
+                    "message": "Task completed!"
+                  }
+                ]
+              }
+            ],
+            "transitions": [
+              {
+                "from_state": "Todo",
+                "to_state": "InProgress",
+                "event": "start",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "start",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Starting task: ${self.Title}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "InProgress",
+                "to_state": "Done",
+                "event": "complete",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "complete",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Completing task: ${self.Title}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "InProgress",
+                "to_state": "Todo",
+                "event": "pause",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "pause",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Pausing task"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

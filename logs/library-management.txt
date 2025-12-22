@@ -1,0 +1,407 @@
+PPPL Model Compiler v1.0.0
+Ready to compile your models...
+--------------------------------------------------------------------------------
+Found 7 model(s) in models folder
+Selected model: banking-system (Model-banking-system.json)
+Selected model: banking-system (Model-banking-system.json)
+--------------------------------------------------------------------------------
+Starting compilation process...
+Input: G:\Program\PPPL-Compiler\models\banking-system\Model-banking-system.json
+Output: G:\Program\PPPL-Compiler\generated_code
+Target Language: Python
+--------------------------------------------------------------------------------
+[INFO] Parsing model file...
+[SUCCESS] Compilation completed successfully!
+Generated 7 files:
+  - G:\Program\PPPL-Compiler\generated_code\banking_system\library\Account.py
+  - G:\Program\PPPL-Compiler\generated_code\banking_system\library\Transaction.py
+  - G:\Program\PPPL-Compiler\generated_code\banking_system\library\Customer.py
+  - G:\Program\PPPL-Compiler\generated_code\banking_system\library\__init__.py
+  - G:\Program\PPPL-Compiler\generated_code\banking_system\main.py
+  - G:\Program\PPPL-Compiler\generated_code\banking_system\docs\API_DOCUMENTATION.md
+  - G:\Program\PPPL-Compiler\generated_code\banking_system\README.md
+
+[INFO] Analyzing model quality...
+======================================================================
+MODEL ANALYSIS REPORT
+======================================================================
+
+📊 MODEL STATISTICS
+----------------------------------------------------------------------
+  Domains:              1
+  Total Classes:        3
+    - Active Classes:   3
+    - Passive Classes:  0
+  State Machines:       2
+  Total States:         9
+  Total Transitions:    8
+  Total Actions:        4
+  Relationships:        1
+
+⚠️  ISSUES FOUND
+----------------------------------------------------------------------
+  1. Active class 'Customer' has no state machine
+
+💡 SUGGESTIONS FOR IMPROVEMENT
+----------------------------------------------------------------------
+  1. Add state machine to 'Customer' to define its behavior
+
+📋 OVERALL ASSESSMENT
+----------------------------------------------------------------------
+  Model Completeness Score: 80/100
+
+  ✅ Excellent! Your model is well-structured and comprehensive.
+
+======================================================================
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+🧪 TEST RUN - Executing compiled model...
+Model directory: G:\Program\PPPL-Compiler\generated_code\banking_system
+--------------------------------------------------------------------------------
+
+📤 EXECUTION OUTPUT:
+----------------------------------------------------------------------
+
+❌ ERRORS:
+----------------------------------------------------------------------
+  Traceback (most recent call last):
+    File "G:\Program\PPPL-Compiler\generated_code\banking_system\main.py", line 8, in <module>
+      from library.Account import Account
+    File "G:\Program\PPPL-Compiler\generated_code\banking_system\library\__init__.py", line 6, in <module>
+      from .Customer import Customer
+    File "G:\Program\PPPL-Compiler\generated_code\banking_system\library\Customer.py", line 9, in <module>
+      class Customer:
+    File "G:\Program\PPPL-Compiler\generated_code\banking_system\library\Customer.py", line 19, in Customer
+      KYCVerified: bool = false
+                          ^^^^^
+  NameError: name 'false' is not defined. Did you mean: 'False'?
+
+----------------------------------------------------------------------
+❌ Test run encountered errors
+
+📋 OBSERVATIONS:
+  • Errors detected: Traceback (most recent call last):
+  File "G:\Program\PPPL-Compiler\generated_code\banking_system\main.py", line 8, in <module>
+    from library.Account import Account
+  File "G:\Program\PPPL-Compiler
+
+💡 RECOMMENDATIONS:
+  • Fix runtime errors in generated code
+  • Output is minimal - consider adding more demonstration logic in main.py
+
+--------------------------------------------------------------------------------
+Log saved to: G:/Program/PPPL-Compiler/logs/banking-system.txt
+Selected model: blog-system (Model-blog-system.json)
+--------------------------------------------------------------------------------
+Starting compilation process...
+Input: G:\Program\PPPL-Compiler\models\blog-system\Model-blog-system.json
+Output: G:\Program\PPPL-Compiler\generated_code
+Target Language: Python
+--------------------------------------------------------------------------------
+[INFO] Parsing model file...
+[SUCCESS] Compilation completed successfully!
+Generated 11 files:
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\Account.py
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\Transaction.py
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\Customer.py
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\User.py
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\Post.py
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\Comment.py
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\Category.py
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\__init__.py
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\main.py
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\docs\API_DOCUMENTATION.md
+  - G:\Program\PPPL-Compiler\generated_code\blog_management_system\README.md
+
+[INFO] Analyzing model quality...
+======================================================================
+MODEL ANALYSIS REPORT
+======================================================================
+
+📊 MODEL STATISTICS
+----------------------------------------------------------------------
+  Domains:              1
+  Total Classes:        7
+    - Active Classes:   7
+    - Passive Classes:  0
+  State Machines:       3
+  Total States:         12
+  Total Transitions:    10
+  Total Actions:        4
+  Relationships:        1
+
+⚠️  ISSUES FOUND
+----------------------------------------------------------------------
+  1. Active class 'Customer' has no state machine
+  2. Active class 'User' has no state machine
+  3. Active class 'Comment' has no state machine
+  4. Active class 'Category' has no state machine
+
+💡 SUGGESTIONS FOR IMPROVEMENT
+----------------------------------------------------------------------
+  1. Add state machine to 'Customer' to define its behavior
+  2. Add state machine to 'User' to define its behavior
+  3. Add state machine to 'Comment' to define its behavior
+  4. Add state machine to 'Category' to define its behavior
+
+📋 OVERALL ASSESSMENT
+----------------------------------------------------------------------
+  Model Completeness Score: 80/100
+
+  ✅ Excellent! Your model is well-structured and comprehensive.
+
+======================================================================
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+🧪 TEST RUN - Executing compiled model...
+Model directory: G:\Program\PPPL-Compiler\generated_code\blog_management_system
+--------------------------------------------------------------------------------
+
+📤 EXECUTION OUTPUT:
+----------------------------------------------------------------------
+
+❌ ERRORS:
+----------------------------------------------------------------------
+  Traceback (most recent call last):
+    File "G:\Program\PPPL-Compiler\generated_code\blog_management_system\main.py", line 8, in <module>
+      from library.Account import Account
+    File "G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\__init__.py", line 6, in <module>
+      from .Customer import Customer
+    File "G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\Customer.py", line 9, in <module>
+      class Customer:
+    File "G:\Program\PPPL-Compiler\generated_code\blog_management_system\library\Customer.py", line 19, in Customer
+      KYCVerified: bool = false
+                          ^^^^^
+  NameError: name 'false' is not defined. Did you mean: 'False'?
+
+----------------------------------------------------------------------
+❌ Test run encountered errors
+
+📋 OBSERVATIONS:
+  • Errors detected: Traceback (most recent call last):
+  File "G:\Program\PPPL-Compiler\generated_code\blog_management_system\main.py", line 8, in <module>
+    from library.Account import Account
+  File "G:\Program\PPPL-
+
+💡 RECOMMENDATIONS:
+  • Fix runtime errors in generated code
+  • Output is minimal - consider adding more demonstration logic in main.py
+
+--------------------------------------------------------------------------------
+Log saved to: G:/Program/PPPL-Compiler/logs/blog-system.txt
+Selected model: e-commerce (Model-e-commerce.json)
+--------------------------------------------------------------------------------
+Starting compilation process...
+Input: G:\Program\PPPL-Compiler\models\e-commerce\Model-e-commerce.json
+Output: G:\Program\PPPL-Compiler\generated_code
+Target Language: Python
+--------------------------------------------------------------------------------
+[INFO] Parsing model file...
+[SUCCESS] Compilation completed successfully!
+Generated 14 files:
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Account.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Transaction.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Customer.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\User.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Post.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Comment.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Category.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Product.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Customer.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Order.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\__init__.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\main.py
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\docs\API_DOCUMENTATION.md
+  - G:\Program\PPPL-Compiler\generated_code\e_commerce_system\README.md
+
+[INFO] Analyzing model quality...
+======================================================================
+MODEL ANALYSIS REPORT
+======================================================================
+
+📊 MODEL STATISTICS
+----------------------------------------------------------------------
+  Domains:              1
+  Total Classes:        10
+    - Active Classes:   10
+    - Passive Classes:  0
+  State Machines:       4
+  Total States:         17
+  Total Transitions:    14
+  Total Actions:        4
+  Relationships:        1
+
+⚠️  ISSUES FOUND
+----------------------------------------------------------------------
+  1. Active class 'Customer' has no state machine
+  2. Active class 'User' has no state machine
+  3. Active class 'Comment' has no state machine
+  4. Active class 'Category' has no state machine
+  5. Active class 'Product' has no state machine
+  6. Active class 'Customer' has no state machine
+
+💡 SUGGESTIONS FOR IMPROVEMENT
+----------------------------------------------------------------------
+  1. Add state machine to 'Customer' to define its behavior
+  2. Add state machine to 'User' to define its behavior
+  3. Add state machine to 'Comment' to define its behavior
+  4. Add state machine to 'Category' to define its behavior
+  5. Add state machine to 'Product' to define its behavior
+  6. Add state machine to 'Customer' to define its behavior
+
+📋 OVERALL ASSESSMENT
+----------------------------------------------------------------------
+  Model Completeness Score: 80/100
+
+  ✅ Excellent! Your model is well-structured and comprehensive.
+
+======================================================================
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+🧪 TEST RUN - Executing compiled model...
+Model directory: G:\Program\PPPL-Compiler\generated_code\e_commerce_system
+--------------------------------------------------------------------------------
+
+📤 EXECUTION OUTPUT:
+----------------------------------------------------------------------
+
+❌ ERRORS:
+----------------------------------------------------------------------
+  Traceback (most recent call last):
+    File "G:\Program\PPPL-Compiler\generated_code\e_commerce_system\main.py", line 8, in <module>
+      from library.Account import Account
+    File "G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\__init__.py", line 9, in <module>
+      from .Comment import Comment
+    File "G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Comment.py", line 9, in <module>
+      class Comment:
+    File "G:\Program\PPPL-Compiler\generated_code\e_commerce_system\library\Comment.py", line 18, in Comment
+      IsApproved: bool = false
+                         ^^^^^
+  NameError: name 'false' is not defined. Did you mean: 'False'?
+
+----------------------------------------------------------------------
+❌ Test run encountered errors
+
+📋 OBSERVATIONS:
+  • Errors detected: Traceback (most recent call last):
+  File "G:\Program\PPPL-Compiler\generated_code\e_commerce_system\main.py", line 8, in <module>
+    from library.Account import Account
+  File "G:\Program\PPPL-Compi
+
+💡 RECOMMENDATIONS:
+  • Fix runtime errors in generated code
+  • Output is minimal - consider adding more demonstration logic in main.py
+
+--------------------------------------------------------------------------------
+Log saved to: G:/Program/PPPL-Compiler/logs/e-commerce.txt
+Selected model: library-management (Model-library-management.json)
+--------------------------------------------------------------------------------
+Starting compilation process...
+Input: G:\Program\PPPL-Compiler\models\library-management\Model-library-management.json
+Output: G:\Program\PPPL-Compiler\generated_code
+Target Language: Python
+--------------------------------------------------------------------------------
+[INFO] Parsing model file...
+[SUCCESS] Compilation completed successfully!
+Generated 17 files:
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Account.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Transaction.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Customer.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\User.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Post.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Comment.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Category.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Product.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Customer.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Order.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Book.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Member.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Loan.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\library\__init__.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\main.py
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\docs\API_DOCUMENTATION.md
+  - G:\Program\PPPL-Compiler\generated_code\library_management_system\README.md
+
+[INFO] Analyzing model quality...
+======================================================================
+MODEL ANALYSIS REPORT
+======================================================================
+
+📊 MODEL STATISTICS
+----------------------------------------------------------------------
+  Domains:              1
+  Total Classes:        13
+    - Active Classes:   13
+    - Passive Classes:  0
+  State Machines:       6
+  Total States:         24
+  Total Transitions:    19
+  Total Actions:        4
+  Relationships:        1
+
+⚠️  ISSUES FOUND
+----------------------------------------------------------------------
+  1. Active class 'Customer' has no state machine
+  2. Active class 'User' has no state machine
+  3. Active class 'Comment' has no state machine
+  4. Active class 'Category' has no state machine
+  5. Active class 'Product' has no state machine
+  6. Active class 'Customer' has no state machine
+  7. Active class 'Member' has no state machine
+
+💡 SUGGESTIONS FOR IMPROVEMENT
+----------------------------------------------------------------------
+  1. Add state machine to 'Customer' to define its behavior
+  2. Add state machine to 'User' to define its behavior
+  3. Add state machine to 'Comment' to define its behavior
+  4. Add state machine to 'Category' to define its behavior
+  5. Add state machine to 'Product' to define its behavior
+  6. Add state machine to 'Customer' to define its behavior
+  7. Book: States {'Maintenance'} are unreachable from initial state
+  8. Add state machine to 'Member' to define its behavior
+
+📋 OVERALL ASSESSMENT
+----------------------------------------------------------------------
+  Model Completeness Score: 80/100
+
+  ✅ Excellent! Your model is well-structured and comprehensive.
+
+======================================================================
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+🧪 TEST RUN - Executing compiled model...
+Model directory: G:\Program\PPPL-Compiler\generated_code\library_management_system
+--------------------------------------------------------------------------------
+
+📤 EXECUTION OUTPUT:
+----------------------------------------------------------------------
+
+❌ ERRORS:
+----------------------------------------------------------------------
+  Traceback (most recent call last):
+    File "G:\Program\PPPL-Compiler\generated_code\library_management_system\main.py", line 8, in <module>
+      from library.Account import Account
+    File "G:\Program\PPPL-Compiler\generated_code\library_management_system\library\__init__.py", line 9, in <module>
+      from .Comment import Comment
+    File "G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Comment.py", line 9, in <module>
+      class Comment:
+    File "G:\Program\PPPL-Compiler\generated_code\library_management_system\library\Comment.py", line 18, in Comment
+      IsApproved: bool = false
+                         ^^^^^
+  NameError: name 'false' is not defined. Did you mean: 'False'?
+
+----------------------------------------------------------------------
+❌ Test run encountered errors
+
+📋 OBSERVATIONS:
+  • Errors detected: Traceback (most recent call last):
+  File "G:\Program\PPPL-Compiler\generated_code\library_management_system\main.py", line 8, in <module>
+    from library.Account import Account
+  File "G:\Program\PP
+
+💡 RECOMMENDATIONS:
+  • Fix runtime errors in generated code
+  • Output is minimal - consider adding more demonstration logic in main.py
+
+--------------------------------------------------------------------------------
+

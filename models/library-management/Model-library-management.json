@@ -1,0 +1,330 @@
+{
+  "system_name": "Library Management System",
+  "version": "1.0.0",
+  "domains": [
+    {
+      "name": "Library Domain",
+      "key_letter": "LD",
+      "description": "Domain untuk manajemen perpustakaan",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "Book",
+          "key_letter": "BK",
+          "description": "Buku dalam perpustakaan",
+          "attributes": [
+            {
+              "name": "BookID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "ISBN",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Title",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Author",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Publisher",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Year",
+              "data_type": "integer",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "TotalCopies",
+              "data_type": "integer",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "AvailableCopies",
+              "data_type": "integer",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Available"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Available",
+            "states": [
+              {"name": "Available"},
+              {"name": "Borrowed"},
+              {"name": "Reserved"},
+              {"name": "Maintenance"}
+            ],
+            "transitions": [
+              {
+                "from_state": "Available",
+                "to_state": "Borrowed",
+                "event": "borrow",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "borrow",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "assign",
+                          "target": "self",
+                          "attribute": "AvailableCopies",
+                          "value": "self.AvailableCopies - 1"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Book borrowed: ${self.Title}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Borrowed",
+                "to_state": "Available",
+                "event": "return",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "return",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "assign",
+                          "target": "self",
+                          "attribute": "AvailableCopies",
+                          "value": "self.AvailableCopies + 1"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Book returned: ${self.Title}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Available",
+                "to_state": "Reserved",
+                "event": "reserve",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "reserve",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Book reserved"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "class",
+          "name": "Member",
+          "key_letter": "MBR",
+          "description": "Anggota perpustakaan",
+          "attributes": [
+            {
+              "name": "MemberID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Name",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Email",
+              "data_type": "email",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Phone",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "MembershipDate",
+              "data_type": "date",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "ExpiryDate",
+              "data_type": "date",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "IsActive",
+              "data_type": "boolean",
+              "attribute_type": "descriptive",
+              "default_value": "true"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "Loan",
+          "key_letter": "LN",
+          "description": "Peminjaman buku",
+          "attributes": [
+            {
+              "name": "LoanID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "BookID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "MemberID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "LoanDate",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "DueDate",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "ReturnDate",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Fine",
+              "data_type": "float",
+              "attribute_type": "descriptive",
+              "default_value": "0.0"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Active"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Active",
+            "states": [
+              {"name": "Active"},
+              {"name": "Returned"},
+              {"name": "Overdue"}
+            ],
+            "transitions": [
+              {
+                "from_state": "Active",
+                "to_state": "Returned",
+                "event": "returnBook",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "returnBook",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Book returned successfully"
+                        },
+                        {
+                          "type": "call",
+                          "target": "Book",
+                          "method": "return",
+                          "parameters": []
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Active",
+                "to_state": "Overdue",
+                "event": "markOverdue",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "markOverdue",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Loan is overdue"
+                        },
+                        {
+                          "type": "assign",
+                          "target": "self",
+                          "attribute": "Fine",
+                          "value": "5.0"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "relationships": [
+        {
+          "name": "R1",
+          "type": "many_to_many",
+          "from_class": "Book",
+          "to_class": "Member",
+          "from_domain": "Library Domain",
+          "to_domain": "Library Domain",
+          "description": "Books can be borrowed by many Members, Members can borrow many Books"
+        },
+        {
+          "name": "R2",
+          "type": "one_to_many",
+          "from_class": "Member",
+          "to_class": "Loan",
+          "from_domain": "Library Domain",
+          "to_domain": "Library Domain",
+          "description": "Member has many Loans"
+        },
+        {
+          "name": "R3",
+          "type": "one_to_many",
+          "from_class": "Book",
+          "to_class": "Loan",
+          "from_domain": "Library Domain",
+          "to_domain": "Library Domain",
+          "description": "Book has many Loans"
+        }
+      ]
+    }
+  ]
+}

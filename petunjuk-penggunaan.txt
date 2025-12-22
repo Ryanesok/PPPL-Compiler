@@ -1,0 +1,14 @@
+Sebelum menggunakan, pastikan model dalam format yang sesuai (.json) dan mengikuti struktur
+model pada MODEL_STRUCTURE.md di dalam folder models/
+
+Cara penggunaan:
+1. Buka compilerModel.py
+2. Pilih / import model yang akan di compile
+3. Lakukan Compile menggunakan tombol compile.
+4. Lakukan test run untuk verifikasi model.
+5. Model telah selesai di compile menjadi source code.
+
+Jika ada error, silahkan periksa Log pada console compiler.
+Contoh Error:
+- Gagal saat compile --> model tidak sesuai struktur yang diminta.
+- test run mengalami error --> model kekurangan suatu modul/atribut pada class, tambahkan modul atau atribut pada model. 

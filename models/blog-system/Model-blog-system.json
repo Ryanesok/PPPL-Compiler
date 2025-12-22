@@ -1,0 +1,250 @@
+{
+  "system_name": "Blog Management System",
+  "version": "1.0.0",
+  "domains": [
+    {
+      "name": "Content Domain",
+      "key_letter": "CD",
+      "description": "Domain untuk manajemen konten blog",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "User",
+          "key_letter": "USR",
+          "description": "User/Author dalam sistem blog",
+          "attributes": [
+            {
+              "name": "UserID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Username",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Email",
+              "data_type": "email",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "FullName",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Bio",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "ProfileImage",
+              "data_type": "url",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "JoinedDate",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "Post",
+          "key_letter": "PST",
+          "description": "Blog post/artikel",
+          "attributes": [
+            {
+              "name": "PostID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "AuthorID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "Title",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Content",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Excerpt",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "PublishedAt",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "ViewCount",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "0"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Draft"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Draft",
+            "states": [
+              {"name": "Draft"},
+              {"name": "Published"},
+              {"name": "Archived"}
+            ],
+            "transitions": [
+              {
+                "from_state": "Draft",
+                "to_state": "Published",
+                "event": "publish",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "publish",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Publishing post: ${self.Title}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Published",
+                "to_state": "Archived",
+                "event": "archive",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "archive",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Archiving post"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "class",
+          "name": "Comment",
+          "key_letter": "CMT",
+          "description": "Komentar pada post",
+          "attributes": [
+            {
+              "name": "CommentID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "PostID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "UserID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "Content",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "CreatedAt",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "IsApproved",
+              "data_type": "boolean",
+              "attribute_type": "descriptive",
+              "default_value": "false"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "Category",
+          "key_letter": "CAT",
+          "description": "Kategori untuk post",
+          "attributes": [
+            {
+              "name": "CategoryID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Name",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Description",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Slug",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "R1",
+          "type": "one_to_many",
+          "from_class": "User",
+          "to_class": "Post",
+          "from_domain": "Content Domain",
+          "to_domain": "Content Domain",
+          "description": "User creates many Posts"
+        },
+        {
+          "name": "R2",
+          "type": "one_to_many",
+          "from_class": "Post",
+          "to_class": "Comment",
+          "from_domain": "Content Domain",
+          "to_domain": "Content Domain",
+          "description": "Post has many Comments"
+        },
+        {
+          "name": "R3",
+          "type": "many_to_many",
+          "from_class": "Post",
+          "to_class": "Category",
+          "from_domain": "Content Domain",
+          "to_domain": "Content Domain",
+          "description": "Posts belong to many Categories"
+        }
+      ]
+    }
+  ]
+}

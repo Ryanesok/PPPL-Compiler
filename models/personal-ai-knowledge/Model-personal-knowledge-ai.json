@@ -1,0 +1,2247 @@
+{
+  "system_name": "Personal Knowledge AI System",
+  "version": "1.0.0",
+  "domains": [
+    {
+      "name": "User Interface Domain",
+      "key_letter": "UID",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "Message",
+          "key_letter": "MSG",
+          "description": "Merepresentasikan pesan dalam chat antara user dan AI.",
+          "attributes": [
+            { "name": "MessageID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "Content", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "Sender", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "Timestamp", "data_type": "datetime", "attribute_type": "descriptive" },
+            { "name": "Type", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "Status", "data_type": "state", "attribute_type": "descriptive", "default_value": "Draft" }
+          ],
+          "state_machine": {
+            "initial_state": "Draft",
+            "states": [
+              { "name": "Draft" },
+              { "name": "Sending" },
+              { "name": "Sent" },
+              { "name": "Delivered" },
+              { "name": "Read" },
+              { "name": "Failed" }
+            ],
+            "transitions": [
+              {
+                "from_state": "Draft",
+                "to_state": "Sending",
+                "event": "userClicksSend",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "userClicksSend",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Sending"
+                        },
+                        {
+                          "type": "call",
+                          "target": "ApiClient",
+                          "method": "postQuery",
+                          "parameters": ["this.Content"]
+                        },
+                        {
+                          "type": "log",
+                          "message": "Message ${self.MessageID} is being sent."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Sending",
+                "to_state": "Sent",
+                "event": "apiCallSuccess",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "apiCallSuccess",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Sent"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Message ${self.MessageID} sent successfully."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Sending",
+                "to_state": "Failed",
+                "event": "networkError",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "networkError",
+                      "parameters": [{ "name": "errorMessage", "type": "string" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Failed"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Message ${self.MessageID} failed: ${errorMessage}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Failed",
+                "to_state": "Sending",
+                "event": "retry",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "retry",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Sending"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Retrying message ${self.MessageID}."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Sent",
+                "to_state": "Delivered",
+                "event": "serverConfirms",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "serverConfirms",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Delivered"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Delivered",
+                "to_state": "Read",
+                "event": "userViews",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "userViews",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Read"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "ChatView",
+          "key_letter": "CHV",
+          "description": "Komponen UI utama untuk menampilkan chat.",
+          "attributes": [
+            { "name": "ViewID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "UserID", "data_type": "uuid", "attribute_type": "descriptive" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "ApiClient",
+          "key_letter": "API",
+          "description": "Menangani komunikasi HTTP ke backend.",
+          "attributes": [
+            { "name": "ClientID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "BaseUrl", "data_type": "string", "attribute_type": "descriptive" }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "relationship_id": "R1",
+          "description": "ChatView menampilkan Message.",
+          "participants": [
+            { "class_name": "ChatView", "role": "menampilkan", "multiplicity": "1" },
+            { "class_name": "Message", "role": "ditampilkan di", "multiplicity": "0..*" }
+          ]
+        },
+        {
+          "relationship_id": "R2",
+          "description": "ChatView menggunakan ApiClient untuk komunikasi.",
+          "participants": [
+            { "class_name": "ChatView", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "ApiClient", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Ingestion Domain",
+      "key_letter": "ING",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "IngestionJob",
+          "key_letter": "IJB",
+          "description": "Merepresentasikan job untuk memproses data yang diingest.",
+          "attributes": [
+            { "name": "JobID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "DataType", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "SourceUri", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "UserID", "data_type": "uuid", "attribute_type": "descriptive" },
+            { "name": "RetryCount", "data_type": "integer", "attribute_type": "descriptive", "default_value": 0 },
+            { "name": "Status", "data_type": "state", "attribute_type": "descriptive", "default_value": "Created" }
+          ],
+          "state_machine": {
+            "initial_state": "Created",
+            "states": [
+              { "name": "Created" },
+              { "name": "Queued" },
+              { "name": "Processing" },
+              { "name": "Validating" },
+              { "name": "Extracting" },
+              { "name": "Completed" },
+              { "name": "Failed" },
+              { "name": "Abandoned" }
+            ],
+            "transitions": [
+              {
+                "from_state": "Created",
+                "to_state": "Queued",
+                "event": "addToQueue",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "addToQueue",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Queued"
+                        },
+                        {
+                          "type": "call",
+                          "target": "MessageQueue",
+                          "method": "publish",
+                          "parameters": ["this"]
+                        },
+                        {
+                          "type": "log",
+                          "message": "Job ${self.JobID} added to queue."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Queued",
+                "to_state": "Processing",
+                "event": "workerPicksUp",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "workerPicksUp",
+                      "parameters": [{ "name": "workerID", "type": "string" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Processing"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Job ${self.JobID} picked up by worker ${workerID}."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Processing",
+                "to_state": "Validating",
+                "event": "checkIntegrity",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "checkIntegrity",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Validating"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Validating job ${self.JobID}."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Validating",
+                "to_state": "Extracting",
+                "event": "validationPassed",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "validationPassed",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Extracting"
+                        },
+                        {
+                          "type": "call",
+                          "target": "ExtractionWorker",
+                          "method": "processJob",
+                          "parameters": ["this"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Validating",
+                "to_state": "Failed",
+                "event": "validationError",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "validationError",
+                      "parameters": [{ "name": "errorDetails", "type": "string" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Failed"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Job ${self.JobID} validation failed: ${errorDetails}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Extracting",
+                "to_state": "Completed",
+                "event": "extractionSuccess",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "extractionSuccess",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Completed"
+                        },
+                        {
+                          "type": "call",
+                          "target": "NotificationService",
+                          "method": "notifyCompletion",
+                          "parameters": ["this.UserID", "this.JobID"]
+                        },
+                        {
+                          "type": "log",
+                          "message": "Job ${self.JobID} completed successfully."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Extracting",
+                "to_state": "Failed",
+                "event": "extractionError",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "extractionError",
+                      "parameters": [{ "name": "errorMessage", "type": "string" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Failed"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Job ${self.JobID} extraction failed: ${errorMessage}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Failed",
+                "to_state": "Queued",
+                "event": "retryJob",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "retryJob",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "increment",
+                          "target": "this",
+                          "attribute": "RetryCount"
+                        },
+                        {
+                          "type": "condition",
+                          "expression": "this.RetryCount <= 3",
+                          "true_steps": [
+                            {
+                              "type": "update",
+                              "target": "this",
+                              "attribute": "Status",
+                              "value": "Queued"
+                            },
+                            {
+                              "type": "log",
+                              "message": "Retrying job ${self.JobID}, attempt ${self.RetryCount}."
+                            }
+                          ],
+                          "false_steps": [
+                            {
+                              "type": "update",
+                              "target": "this",
+                              "attribute": "Status",
+                              "value": "Abandoned"
+                            },
+                            {
+                              "type": "log",
+                              "message": "Job ${self.JobID} abandoned after ${self.RetryCount} retries."
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "IngestController",
+          "key_letter": "ICT",
+          "description": "API endpoint untuk menerima data.",
+          "attributes": [
+            { "name": "ControllerID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "IngestService",
+          "key_letter": "ISV",
+          "description": "Service untuk memvalidasi dan memproses data yang diingest.",
+          "attributes": [
+            { "name": "ServiceID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "MessageQueue",
+          "key_letter": "MQU",
+          "description": "Message queue untuk mengelola job.",
+          "attributes": [
+            { "name": "QueueID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "QueueName", "data_type": "string", "attribute_type": "descriptive" }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "relationship_id": "R3",
+          "description": "IngestController menggunakan IngestService.",
+          "participants": [
+            { "class_name": "IngestController", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "IngestService", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R4",
+          "description": "IngestService membuat IngestionJob.",
+          "participants": [
+            { "class_name": "IngestService", "role": "membuat", "multiplicity": "1" },
+            { "class_name": "IngestionJob", "role": "dibuat oleh", "multiplicity": "0..*" }
+          ]
+        },
+        {
+          "relationship_id": "R5",
+          "description": "IngestionJob dipublikasikan ke MessageQueue.",
+          "participants": [
+            { "class_name": "IngestionJob", "role": "dipublikasikan ke", "multiplicity": "0..*" },
+            { "class_name": "MessageQueue", "role": "menerima", "multiplicity": "1" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Extraction Domain",
+      "key_letter": "EXT",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "ExtractionResult",
+          "key_letter": "EXR",
+          "description": "Hasil dari proses ekstraksi teks.",
+          "attributes": [
+            { "name": "ResultID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "JobID", "data_type": "uuid", "attribute_type": "referential" },
+            { "name": "ExtractedText", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "Metadata", "data_type": "json", "attribute_type": "descriptive" },
+            { "name": "Status", "data_type": "state", "attribute_type": "descriptive", "default_value": "Pending" }
+          ],
+          "state_machine": {
+            "initial_state": "Pending",
+            "states": [
+              { "name": "Pending" },
+              { "name": "Extracting" },
+              { "name": "TextExtracted" },
+              { "name": "Validating" },
+              { "name": "Valid" },
+              { "name": "Invalid" },
+              { "name": "MetadataEnriched" },
+              { "name": "ReadyForStorage" },
+              { "name": "Storing" },
+              { "name": "Stored" },
+              { "name": "StorageFailed" },
+              { "name": "Failed" }
+            ],
+            "transitions": [
+              {
+                "from_state": "Pending",
+                "to_state": "Extracting",
+                "event": "startExtraction",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "startExtraction",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Extracting"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Starting extraction for result ${self.ResultID}."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Extracting",
+                "to_state": "TextExtracted",
+                "event": "extractionComplete",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "extractionComplete",
+                      "parameters": [{ "name": "text", "type": "string" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "ExtractedText",
+                          "value": "${text}"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "TextExtracted"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Text extracted for result ${self.ResultID}."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "TextExtracted",
+                "to_state": "Validating",
+                "event": "validateContent",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "validateContent",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Validating"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Validating",
+                "to_state": "Valid",
+                "event": "contentIsValid",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "contentIsValid",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Valid"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Validating",
+                "to_state": "Invalid",
+                "event": "contentIsInvalid",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "contentIsInvalid",
+                      "parameters": [{ "name": "reason", "type": "string" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Invalid"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Content invalid for result ${self.ResultID}: ${reason}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Invalid",
+                "to_state": "Failed",
+                "event": "markAsFailed",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "markAsFailed",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Failed"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Valid",
+                "to_state": "MetadataEnriched",
+                "event": "addMetadata",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "addMetadata",
+                      "parameters": [{ "name": "metadata", "type": "json" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Metadata",
+                          "value": "${metadata}"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "MetadataEnriched"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "MetadataEnriched",
+                "to_state": "ReadyForStorage",
+                "event": "prepareForStorage",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "prepareForStorage",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "ReadyForStorage"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "ReadyForStorage",
+                "to_state": "Storing",
+                "event": "sendToStorage",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "sendToStorage",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Storing"
+                        },
+                        {
+                          "type": "call",
+                          "target": "StorageService",
+                          "method": "storeDocument",
+                          "parameters": ["this"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Storing",
+                "to_state": "Stored",
+                "event": "storageSuccess",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "storageSuccess",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Stored"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Result ${self.ResultID} stored successfully."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Storing",
+                "to_state": "StorageFailed",
+                "event": "storageError",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "storageError",
+                      "parameters": [{ "name": "errorMessage", "type": "string" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "StorageFailed"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Storage failed for result ${self.ResultID}: ${errorMessage}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "StorageFailed",
+                "to_state": "Storing",
+                "event": "retryStorage",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "retryStorage",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Storing"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Retrying storage for result ${self.ResultID}."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "ExtractionWorker",
+          "key_letter": "EXW",
+          "description": "Worker yang memproses job ekstraksi.",
+          "attributes": [
+            { "name": "WorkerID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "ExtractionFactory",
+          "key_letter": "EXF",
+          "description": "Factory untuk memilih strategy ekstraksi yang tepat.",
+          "attributes": [
+            { "name": "FactoryID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "PdfExtractor",
+          "key_letter": "PDF",
+          "description": "Strategy untuk ekstraksi PDF.",
+          "attributes": [
+            { "name": "ExtractorID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "OcrExtractor",
+          "key_letter": "OCR",
+          "description": "Strategy untuk ekstraksi gambar dengan OCR.",
+          "attributes": [
+            { "name": "ExtractorID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "AudioTranscriber",
+          "key_letter": "AUD",
+          "description": "Strategy untuk transkripsi audio.",
+          "attributes": [
+            { "name": "TranscriberID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "relationship_id": "R6",
+          "description": "ExtractionWorker menggunakan ExtractionFactory.",
+          "participants": [
+            { "class_name": "ExtractionWorker", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "ExtractionFactory", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R7",
+          "description": "ExtractionWorker membuat ExtractionResult.",
+          "participants": [
+            { "class_name": "ExtractionWorker", "role": "membuat", "multiplicity": "1" },
+            { "class_name": "ExtractionResult", "role": "dibuat oleh", "multiplicity": "0..*" }
+          ]
+        },
+        {
+          "relationship_id": "R8",
+          "description": "ExtractionFactory mengelola berbagai extractor strategies.",
+          "participants": [
+            { "class_name": "ExtractionFactory", "role": "mengelola", "multiplicity": "1" },
+            { "class_name": "PdfExtractor", "role": "dikelola oleh", "multiplicity": "0..*" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Storage Domain",
+      "key_letter": "STR",
+      "classes": [
+        {
+          "entity_type": "passive_class",
+          "name": "StorageService",
+          "key_letter": "STS",
+          "description": "Service untuk menyimpan dokumen yang telah diekstrak.",
+          "attributes": [
+            { "name": "ServiceID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "EmbeddingGenerator",
+          "key_letter": "EMB",
+          "description": "Generator untuk membuat vector embedding dari teks.",
+          "attributes": [
+            { "name": "GeneratorID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "ModelName", "data_type": "string", "attribute_type": "descriptive" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "VectorClient",
+          "key_letter": "VEC",
+          "description": "Client untuk berinteraksi dengan vector database.",
+          "attributes": [
+            { "name": "ClientID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "DatabaseUrl", "data_type": "string", "attribute_type": "descriptive" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "MetadataClient",
+          "key_letter": "MTC",
+          "description": "Client untuk menyimpan metadata dokumen.",
+          "attributes": [
+            { "name": "ClientID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "DatabaseUrl", "data_type": "string", "attribute_type": "descriptive" }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "relationship_id": "R9",
+          "description": "StorageService menggunakan EmbeddingGenerator.",
+          "participants": [
+            { "class_name": "StorageService", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "EmbeddingGenerator", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R10",
+          "description": "StorageService menggunakan VectorClient.",
+          "participants": [
+            { "class_name": "StorageService", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "VectorClient", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R11",
+          "description": "StorageService menggunakan MetadataClient.",
+          "participants": [
+            { "class_name": "StorageService", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "MetadataClient", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AI Core Domain",
+      "key_letter": "AIC",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "Answer",
+          "key_letter": "ANS",
+          "description": "Jawaban yang dihasilkan oleh AI untuk query pengguna.",
+          "attributes": [
+            { "name": "AnswerID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "QueryText", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "AnswerText", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "Sources", "data_type": "json", "attribute_type": "descriptive" },
+            { "name": "Confidence", "data_type": "float", "attribute_type": "descriptive" },
+            { "name": "Status", "data_type": "state", "attribute_type": "descriptive", "default_value": "Received" }
+          ],
+          "state_machine": {
+            "initial_state": "Received",
+            "states": [
+              { "name": "Received" },
+              { "name": "RetrievingContext" },
+              { "name": "ContextFound" },
+              { "name": "NoContext" },
+              { "name": "BuildingPrompt" },
+              { "name": "GeneratingAnswer" },
+              { "name": "Streaming" },
+              { "name": "PartialAnswer" },
+              { "name": "Complete" },
+              { "name": "FormattingResponse" },
+              { "name": "ReadyToSend" },
+              { "name": "Sent" },
+              { "name": "Failed" },
+              { "name": "ErrorResponse" }
+            ],
+            "transitions": [
+              {
+                "from_state": "Received",
+                "to_state": "RetrievingContext",
+                "event": "searchRelevantDocs",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "searchRelevantDocs",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "RetrievingContext"
+                        },
+                        {
+                          "type": "call",
+                          "target": "DocumentRetriever",
+                          "method": "findRelevantDocs",
+                          "parameters": ["this.QueryText"]
+                        },
+                        {
+                          "type": "log",
+                          "message": "Retrieving context for answer ${self.AnswerID}."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "RetrievingContext",
+                "to_state": "ContextFound",
+                "event": "docsRetrieved",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "docsRetrieved",
+                      "parameters": [{ "name": "documents", "type": "json" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Sources",
+                          "value": "${documents}"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "ContextFound"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "RetrievingContext",
+                "to_state": "NoContext",
+                "event": "noDocsFound",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "noDocsFound",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "NoContext"
+                        },
+                        {
+                          "type": "log",
+                          "message": "No context found for answer ${self.AnswerID}."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "ContextFound",
+                "to_state": "BuildingPrompt",
+                "event": "preparePrompt",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "preparePrompt",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "BuildingPrompt"
+                        },
+                        {
+                          "type": "call",
+                          "target": "PromptBuilder",
+                          "method": "buildPrompt",
+                          "parameters": ["this.QueryText", "this.Sources"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "NoContext",
+                "to_state": "BuildingPrompt",
+                "event": "useFallbackPrompt",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "useFallbackPrompt",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "BuildingPrompt"
+                        },
+                        {
+                          "type": "call",
+                          "target": "PromptBuilder",
+                          "method": "buildFallbackPrompt",
+                          "parameters": ["this.QueryText"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "BuildingPrompt",
+                "to_state": "GeneratingAnswer",
+                "event": "sendToLLM",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "sendToLLM",
+                      "parameters": [{ "name": "prompt", "type": "string" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "GeneratingAnswer"
+                        },
+                        {
+                          "type": "call",
+                          "target": "LLMClient",
+                          "method": "generate",
+                          "parameters": ["${prompt}"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "GeneratingAnswer",
+                "to_state": "Streaming",
+                "event": "startStreaming",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "startStreaming",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Streaming"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Streaming",
+                "to_state": "PartialAnswer",
+                "event": "chunksReceived",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "chunksReceived",
+                      "parameters": [{ "name": "chunk", "type": "string" }],
+                      "steps": [
+                        {
+                          "type": "append",
+                          "target": "this",
+                          "attribute": "AnswerText",
+                          "value": "${chunk}"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "PartialAnswer"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "PartialAnswer",
+                "to_state": "Streaming",
+                "event": "continueStreaming",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "continueStreaming",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Streaming"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "PartialAnswer",
+                "to_state": "Complete",
+                "event": "streamFinished",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "streamFinished",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Complete"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Answer ${self.AnswerID} generation complete."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "GeneratingAnswer",
+                "to_state": "Failed",
+                "event": "llmError",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "llmError",
+                      "parameters": [{ "name": "errorMessage", "type": "string" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Failed"
+                        },
+                        {
+                          "type": "log",
+                          "message": "LLM error for answer ${self.AnswerID}: ${errorMessage}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Failed",
+                "to_state": "GeneratingAnswer",
+                "event": "retryWithFallback",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "retryWithFallback",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "GeneratingAnswer"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Retrying answer ${self.AnswerID} with fallback model."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Failed",
+                "to_state": "ErrorResponse",
+                "event": "maxRetriesExceeded",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "maxRetriesExceeded",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "ErrorResponse"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "AnswerText",
+                          "value": "Sorry, I encountered an error generating your answer."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Complete",
+                "to_state": "FormattingResponse",
+                "event": "formatAnswer",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "formatAnswer",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "FormattingResponse"
+                        },
+                        {
+                          "type": "call",
+                          "target": "ResponseFormatter",
+                          "method": "format",
+                          "parameters": ["this.AnswerText", "this.Sources"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "FormattingResponse",
+                "to_state": "ReadyToSend",
+                "event": "formattingComplete",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "formattingComplete",
+                      "parameters": [{ "name": "confidence", "type": "float" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Confidence",
+                          "value": "${confidence}"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "ReadyToSend"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "ReadyToSend",
+                "to_state": "Sent",
+                "event": "deliverToUser",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "deliverToUser",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Sent"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Answer ${self.AnswerID} sent to user."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "ErrorResponse",
+                "to_state": "Sent",
+                "event": "sendErrorMessage",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "sendErrorMessage",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Sent"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "QueryController",
+          "key_letter": "QCT",
+          "description": "Controller untuk menangani query pengguna.",
+          "attributes": [
+            { "name": "ControllerID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "RAGService",
+          "key_letter": "RAG",
+          "description": "Service untuk mengorkestrasi proses RAG.",
+          "attributes": [
+            { "name": "ServiceID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "DocumentRetriever",
+          "key_letter": "DRT",
+          "description": "Retriever untuk mencari dokumen relevan.",
+          "attributes": [
+            { "name": "RetrieverID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "PromptBuilder",
+          "key_letter": "PMB",
+          "description": "Builder untuk menyusun prompt RAG.",
+          "attributes": [
+            { "name": "BuilderID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "LLMClient",
+          "key_letter": "LLM",
+          "description": "Client untuk berkomunikasi dengan Large Language Model.",
+          "attributes": [
+            { "name": "ClientID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "ModelName", "data_type": "string", "attribute_type": "descriptive" }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "relationship_id": "R12",
+          "description": "QueryController menggunakan RAGService.",
+          "participants": [
+            { "class_name": "QueryController", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "RAGService", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R13",
+          "description": "RAGService membuat Answer.",
+          "participants": [
+            { "class_name": "RAGService", "role": "membuat", "multiplicity": "1" },
+            { "class_name": "Answer", "role": "dibuat oleh", "multiplicity": "0..*" }
+          ]
+        },
+        {
+          "relationship_id": "R14",
+          "description": "RAGService menggunakan DocumentRetriever.",
+          "participants": [
+            { "class_name": "RAGService", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "DocumentRetriever", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R15",
+          "description": "RAGService menggunakan PromptBuilder.",
+          "participants": [
+            { "class_name": "RAGService", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "PromptBuilder", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R16",
+          "description": "RAGService menggunakan LLMClient.",
+          "participants": [
+            { "class_name": "RAGService", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "LLMClient", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Proactive Analysis Domain",
+      "key_letter": "PAD",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "Insight",
+          "key_letter": "INS",
+          "description": "Insight yang dihasilkan dari analisis proaktif.",
+          "attributes": [
+            { "name": "InsightID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "Title", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "Description", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "RelatedDocs", "data_type": "json", "attribute_type": "descriptive" },
+            { "name": "Priority", "data_type": "string", "attribute_type": "descriptive" },
+            { "name": "Score", "data_type": "float", "attribute_type": "descriptive" },
+            { "name": "UserID", "data_type": "uuid", "attribute_type": "descriptive" },
+            { "name": "Status", "data_type": "state", "attribute_type": "descriptive", "default_value": "Analyzing" }
+          ],
+          "state_machine": {
+            "initial_state": "Analyzing",
+            "states": [
+              { "name": "Analyzing" },
+              { "name": "PatternDetected" },
+              { "name": "NoPattern" },
+              { "name": "Scoring" },
+              { "name": "HighPriority" },
+              { "name": "LowPriority" },
+              { "name": "Validating" },
+              { "name": "Valid" },
+              { "name": "Invalid" },
+              { "name": "ReadyToNotify" },
+              { "name": "Notifying" },
+              { "name": "Sent" },
+              { "name": "Failed" },
+              { "name": "Abandoned" },
+              { "name": "Viewed" },
+              { "name": "Expired" },
+              { "name": "Acknowledged" },
+              { "name": "Dismissed" },
+              { "name": "Actioned" },
+              { "name": "Queued" },
+              { "name": "Discarded" }
+            ],
+            "transitions": [
+              {
+                "from_state": "Analyzing",
+                "to_state": "PatternDetected",
+                "event": "foundConnections",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "foundConnections",
+                      "parameters": [{ "name": "relatedDocs", "type": "json" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "RelatedDocs",
+                          "value": "${relatedDocs}"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "PatternDetected"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Pattern detected for insight ${self.InsightID}."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Analyzing",
+                "to_state": "NoPattern",
+                "event": "noInsightsFound",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "noInsightsFound",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "NoPattern"
+                        },
+                        {
+                          "type": "log",
+                          "message": "No patterns found for insight ${self.InsightID}."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "PatternDetected",
+                "to_state": "Scoring",
+                "event": "calculatePriority",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "calculatePriority",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Scoring"
+                        },
+                        {
+                          "type": "call",
+                          "target": "PriorityScorer",
+                          "method": "calculateScore",
+                          "parameters": ["this.RelatedDocs"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Scoring",
+                "to_state": "HighPriority",
+                "event": "scoreAboveThreshold",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "scoreAboveThreshold",
+                      "parameters": [{ "name": "score", "type": "float" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Score",
+                          "value": "${score}"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Priority",
+                          "value": "High"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "HighPriority"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Scoring",
+                "to_state": "LowPriority",
+                "event": "scoreBelowThreshold",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "scoreBelowThreshold",
+                      "parameters": [{ "name": "score", "type": "float" }],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Score",
+                          "value": "${score}"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Priority",
+                          "value": "Low"
+                        },
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "LowPriority"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "HighPriority",
+                "to_state": "Validating",
+                "event": "checkRelevance",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "checkRelevance",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Validating"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "LowPriority",
+                "to_state": "Queued",
+                "event": "storeForLater",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "storeForLater",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Queued"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Insight ${self.InsightID} queued for later."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Validating",
+                "to_state": "Valid",
+                "event": "passesValidation",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "passesValidation",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Valid"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Validating",
+                "to_state": "Invalid",
+                "event": "notRelevant",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "notRelevant",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Invalid"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Insight ${self.InsightID} marked as not relevant."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Valid",
+                "to_state": "ReadyToNotify",
+                "event": "prepareNotification",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "prepareNotification",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "ReadyToNotify"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Invalid",
+                "to_state": "Discarded",
+                "event": "discardInsight",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "discardInsight",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Discarded"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Insight ${self.InsightID} discarded."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "ReadyToNotify",
+                "to_state": "Notifying",
+                "event": "sendToUser",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "sendToUser",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Notifying"
+                        },
+                        {
+                          "type": "call",
+                          "target": "NotificationService",
+                          "method": "send",
+                          "parameters": ["this.UserID", "this"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Notifying",
+                "to_state": "Sent",
+                "event": "deliverySuccess",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "deliverySuccess",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Sent"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Notifying",
+                "to_state": "Failed",
+                "event": "deliveryFailed",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "deliveryFailed",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Failed"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Failed",
+                "to_state": "Notifying",
+                "event": "retry",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "retry",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Notifying"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Failed",
+                "to_state": "Abandoned",
+                "event": "maxRetries",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "maxRetries",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Abandoned"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Sent",
+                "to_state": "Viewed",
+                "event": "userOpensNotification",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "userOpensNotification",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Viewed"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Sent",
+                "to_state": "Expired",
+                "event": "notViewedIn7Days",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "notViewedIn7Days",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Expired"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Viewed",
+                "to_state": "Acknowledged",
+                "event": "userAcknowledges",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "userAcknowledges",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Acknowledged"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Viewed",
+                "to_state": "Dismissed",
+                "event": "userDismisses",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "userDismisses",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Dismissed"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Acknowledged",
+                "to_state": "Actioned",
+                "event": "userActsOnInsight",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "userActsOnInsight",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "this",
+                          "attribute": "Status",
+                          "value": "Actioned"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "ProactiveWorker",
+          "key_letter": "PAW",
+          "description": "Worker yang menjalankan analisis proaktif terjadwal.",
+          "attributes": [
+            { "name": "WorkerID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "AnalysisEngine",
+          "key_letter": "ANE",
+          "description": "Mesin yang menjalankan berbagai strategi analisis.",
+          "attributes": [
+            { "name": "EngineID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "NotificationService",
+          "key_letter": "NOS",
+          "description": "Service untuk mengirim notifikasi insight ke pengguna.",
+          "attributes": [
+            { "name": "ServiceID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "IAnalysisStrategy",
+          "key_letter": "IAS",
+          "description": "Interface untuk strategi analisis (e.g., ConnectionFinder).",
+          "attributes": [
+            { "name": "StrategyID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "ConnectionFinder",
+          "key_letter": "COF",
+          "description": "Implementasi strategi untuk menemukan koneksi antar dokumen.",
+          "attributes": [
+            { "name": "FinderID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "GapDetector",
+          "key_letter": "GAD",
+          "description": "Implementasi strategi untuk mendeteksi kesenjangan pengetahuan.",
+          "attributes": [
+            { "name": "DetectorID", "data_type": "uuid", "attribute_type": "naming" }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "relationship_id": "R17",
+          "description": "ProactiveWorker menggunakan AnalysisEngine.",
+          "participants": [
+            { "class_name": "ProactiveWorker", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "AnalysisEngine", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R18",
+          "description": "ProactiveWorker menggunakan NotificationService.",
+          "participants": [
+            { "class_name": "ProactiveWorker", "role": "menggunakan", "multiplicity": "1" },
+            { "class_name": "NotificationService", "role": "digunakan oleh", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R19",
+          "description": "AnalysisEngine mengelola IAnalysisStrategy.",
+          "participants": [
+            { "class_name": "AnalysisEngine", "role": "mengelola", "multiplicity": "1" },
+            { "class_name": "IAnalysisStrategy", "role": "dikelola oleh", "multiplicity": "0..*" }
+          ]
+        },
+        {
+          "relationship_id": "R20",
+          "description": "ConnectionFinder adalah implementasi dari IAnalysisStrategy.",
+          "participants": [
+            { "class_name": "IAnalysisStrategy", "role": "interface", "multiplicity": "1" },
+            { "class_name": "ConnectionFinder", "role": "implementasi", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R21",
+          "description": "GapDetector adalah implementasi dari IAnalysisStrategy.",
+          "participants": [
+            { "class_name": "IAnalysisStrategy", "role": "interface", "multiplicity": "1" },
+            { "class_name": "GapDetector", "role": "implementasi", "multiplicity": "1" }
+          ]
+        },
+        {
+          "relationship_id": "R22",
+          "description": "AnalysisEngine menghasilkan Insight.",
+          "participants": [
+            { "class_name": "AnalysisEngine", "role": "menghasilkan", "multiplicity": "1" },
+            { "class_name": "Insight", "role": "dihasilkan oleh", "multiplicity": "0..*" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+                          

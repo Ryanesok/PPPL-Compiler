@@ -1,0 +1,363 @@
+{
+  "system_name": "Social Media Platform",
+  "version": "1.0.0",
+  "domains": [
+    {
+      "name": "User Domain",
+      "key_letter": "UD",
+      "description": "Domain untuk manajemen user dan profil",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "User",
+          "key_letter": "USR",
+          "description": "Pengguna platform",
+          "attributes": [
+            {
+              "name": "UserID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Username",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Email",
+              "data_type": "email",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "DisplayName",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Bio",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "AvatarURL",
+              "data_type": "url",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "FollowerCount",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "0"
+            },
+            {
+              "name": "FollowingCount",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "0"
+            },
+            {
+              "name": "IsVerified",
+              "data_type": "boolean",
+              "attribute_type": "descriptive",
+              "default_value": "false"
+            },
+            {
+              "name": "JoinedDate",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "Post",
+          "key_letter": "PST",
+          "description": "Postingan user",
+          "attributes": [
+            {
+              "name": "PostID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "UserID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "Content",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "MediaURLs",
+              "data_type": "list",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Hashtags",
+              "data_type": "list",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "LikeCount",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "0"
+            },
+            {
+              "name": "CommentCount",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "0"
+            },
+            {
+              "name": "ShareCount",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "0"
+            },
+            {
+              "name": "CreatedAt",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Draft"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Draft",
+            "states": [
+              {"name": "Draft"},
+              {"name": "Published"},
+              {"name": "Flagged"},
+              {"name": "Deleted"}
+            ],
+            "transitions": [
+              {
+                "from_state": "Draft",
+                "to_state": "Published",
+                "event": "publish",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "publish",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Publishing post ${self.PostID}"
+                        },
+                        {
+                          "type": "call",
+                          "target": "NotificationService",
+                          "method": "notifyFollowers",
+                          "parameters": ["self.UserID"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Published",
+                "to_state": "Flagged",
+                "event": "flag",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "flag",
+                      "parameters": [
+                        {"name": "reason", "type": "string"}
+                      ],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Post flagged: ${reason}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Published",
+                "to_state": "Deleted",
+                "event": "delete",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "delete",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Deleting post"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "class",
+          "name": "Comment",
+          "key_letter": "CMT",
+          "description": "Komentar pada post",
+          "attributes": [
+            {
+              "name": "CommentID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "PostID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "UserID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "Content",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "LikeCount",
+              "data_type": "integer",
+              "attribute_type": "descriptive",
+              "default_value": "0"
+            },
+            {
+              "name": "CreatedAt",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "Follow",
+          "key_letter": "FLW",
+          "description": "Relasi follow antar user",
+          "attributes": [
+            {
+              "name": "FollowID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "FollowerID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "FollowingID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "FollowedAt",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "Like",
+          "key_letter": "LK",
+          "description": "Like pada post atau comment",
+          "attributes": [
+            {
+              "name": "LikeID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "UserID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "TargetID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "TargetType",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "CreatedAt",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            }
+          ]
+        },
+        {
+          "entity_type": "external_entity",
+          "name": "NotificationService",
+          "key_letter": "NS",
+          "description": "Service untuk notifikasi",
+          "attributes": [
+            {
+              "name": "ServiceID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "R1",
+          "type": "one_to_many",
+          "from_class": "User",
+          "to_class": "Post",
+          "from_domain": "User Domain",
+          "to_domain": "User Domain",
+          "description": "User creates many Posts"
+        },
+        {
+          "name": "R2",
+          "type": "one_to_many",
+          "from_class": "Post",
+          "to_class": "Comment",
+          "from_domain": "User Domain",
+          "to_domain": "User Domain",
+          "description": "Post has many Comments"
+        },
+        {
+          "name": "R3",
+          "type": "many_to_many",
+          "from_class": "User",
+          "to_class": "User",
+          "from_domain": "User Domain",
+          "to_domain": "User Domain",
+          "description": "Users follow other Users (self-referential)"
+        },
+        {
+          "name": "R4",
+          "type": "many_to_many",
+          "from_class": "User",
+          "to_class": "Post",
+          "from_domain": "User Domain",
+          "to_domain": "User Domain",
+          "description": "Users like many Posts"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,402 @@
+{
+  "system_name": "Banking System",
+  "version": "1.0.0",
+  "domains": [
+    {
+      "name": "Banking Domain",
+      "key_letter": "BD",
+      "description": "Domain untuk sistem perbankan",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "Account",
+          "key_letter": "ACC",
+          "description": "Rekening bank",
+          "attributes": [
+            {
+              "name": "AccountID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "AccountNumber",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "AccountType",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Balance",
+              "data_type": "decimal",
+              "attribute_type": "descriptive",
+              "default_value": "0.0"
+            },
+            {
+              "name": "Currency",
+              "data_type": "string",
+              "attribute_type": "descriptive",
+              "default_value": "USD"
+            },
+            {
+              "name": "CreatedDate",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Pending"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Pending",
+            "states": [
+              {
+                "name": "Pending",
+                "on_entry": [
+                  {
+                    "type": "log",
+                    "message": "Account pending approval"
+                  }
+                ]
+              },
+              {
+                "name": "Active",
+                "on_entry": [
+                  {
+                    "type": "log",
+                    "message": "Account activated"
+                  }
+                ]
+              },
+              {
+                "name": "Frozen",
+                "on_entry": [
+                  {
+                    "type": "log",
+                    "message": "Account frozen - no transactions allowed"
+                  }
+                ]
+              },
+              {
+                "name": "Closed",
+                "on_entry": [
+                  {
+                    "type": "log",
+                    "message": "Account closed permanently"
+                  }
+                ]
+              }
+            ],
+            "transitions": [
+              {
+                "from_state": "Pending",
+                "to_state": "Active",
+                "event": "approve",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "approve",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Approving account ${self.AccountNumber}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Active",
+                "to_state": "Frozen",
+                "event": "freeze",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "freeze",
+                      "parameters": [
+                        {"name": "reason", "type": "string"}
+                      ],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Freezing account due to: ${reason}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Frozen",
+                "to_state": "Active",
+                "event": "unfreeze",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "unfreeze",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Unfreezing account"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Active",
+                "to_state": "Closed",
+                "event": "close",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "close",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "assign",
+                          "target": "self",
+                          "attribute": "Balance",
+                          "value": "0.0"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Closing account - balance cleared"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "class",
+          "name": "Transaction",
+          "key_letter": "TXN",
+          "description": "Transaksi keuangan",
+          "attributes": [
+            {
+              "name": "TransactionID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "AccountID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "Type",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Amount",
+              "data_type": "decimal",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Description",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Timestamp",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Pending"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Pending",
+            "states": [
+              {"name": "Pending"},
+              {"name": "Processing"},
+              {"name": "Completed"},
+              {"name": "Failed"},
+              {"name": "Reversed"}
+            ],
+            "transitions": [
+              {
+                "from_state": "Pending",
+                "to_state": "Processing",
+                "event": "process",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "process",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Processing transaction ${self.TransactionID}"
+                        },
+                        {
+                          "type": "call",
+                          "target": "Account",
+                          "method": "validateBalance",
+                          "parameters": ["self.Amount"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Processing",
+                "to_state": "Completed",
+                "event": "complete",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "complete",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Transaction completed successfully"
+                        },
+                        {
+                          "type": "call",
+                          "target": "Account",
+                          "method": "updateBalance",
+                          "parameters": ["self.Amount"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Processing",
+                "to_state": "Failed",
+                "event": "fail",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "fail",
+                      "parameters": [
+                        {"name": "errorMessage", "type": "string"}
+                      ],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Transaction failed: ${errorMessage}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Completed",
+                "to_state": "Reversed",
+                "event": "reverse",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "reverse",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Reversing transaction"
+                        },
+                        {
+                          "type": "call",
+                          "target": "Account",
+                          "method": "reverseBalance",
+                          "parameters": ["self.Amount"]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "class",
+          "name": "Customer",
+          "key_letter": "CST",
+          "description": "Nasabah bank",
+          "attributes": [
+            {
+              "name": "CustomerID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "FullName",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Email",
+              "data_type": "email",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Phone",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "DateOfBirth",
+              "data_type": "date",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Address",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "KYCVerified",
+              "data_type": "boolean",
+              "attribute_type": "descriptive",
+              "default_value": "false"
+            }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "R1",
+          "type": "one_to_many",
+          "from_class": "Customer",
+          "to_class": "Account",
+          "from_domain": "Banking Domain",
+          "to_domain": "Banking Domain",
+          "description": "Customer owns many Accounts"
+        },
+        {
+          "name": "R2",
+          "type": "one_to_many",
+          "from_class": "Account",
+          "to_class": "Transaction",
+          "from_domain": "Banking Domain",
+          "to_domain": "Banking Domain",
+          "description": "Account has many Transactions"
+        }
+      ]
+    }
+  ]
+}

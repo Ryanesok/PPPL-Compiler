@@ -1,0 +1,248 @@
+{
+  "system_name": "E-Commerce System",
+  "version": "1.0.0",
+  "domains": [
+    {
+      "name": "Product Domain",
+      "key_letter": "PD",
+      "description": "Domain untuk manajemen produk",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "Product",
+          "key_letter": "PRD",
+          "description": "Produk yang dijual",
+          "attributes": [
+            {
+              "name": "ProductID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Name",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Description",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Price",
+              "data_type": "float",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Stock",
+              "data_type": "integer",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "IsAvailable",
+              "data_type": "boolean",
+              "attribute_type": "descriptive",
+              "default_value": "true"
+            },
+            {
+              "name": "Category",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Tags",
+              "data_type": "list",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Metadata",
+              "data_type": "dict",
+              "attribute_type": "descriptive"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "Customer",
+          "key_letter": "CST",
+          "description": "Pelanggan yang berbelanja",
+          "attributes": [
+            {
+              "name": "CustomerID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Name",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Email",
+              "data_type": "email",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Phone",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Address",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "JoinDate",
+              "data_type": "date",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "TotalSpent",
+              "data_type": "decimal",
+              "attribute_type": "descriptive"
+            }
+          ]
+        },
+        {
+          "entity_type": "class",
+          "name": "Order",
+          "key_letter": "ORD",
+          "description": "Pesanan pelanggan",
+          "attributes": [
+            {
+              "name": "OrderID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "CustomerID",
+              "data_type": "uuid",
+              "attribute_type": "referential"
+            },
+            {
+              "name": "OrderDate",
+              "data_type": "datetime",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "TotalAmount",
+              "data_type": "float",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Pending"
+            },
+            {
+              "name": "ShippingAddress",
+              "data_type": "text",
+              "attribute_type": "descriptive"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Pending",
+            "states": [
+              {"name": "Pending"},
+              {"name": "Confirmed"},
+              {"name": "Shipped"},
+              {"name": "Delivered"},
+              {"name": "Cancelled"}
+            ],
+            "transitions": [
+              {
+                "from_state": "Pending",
+                "to_state": "Confirmed",
+                "event": "confirm",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "confirm",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Order ${self.OrderID} confirmed"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Confirmed",
+                "to_state": "Shipped",
+                "event": "ship",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "ship",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Order shipped"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Shipped",
+                "to_state": "Delivered",
+                "event": "deliver",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "deliver",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Order delivered successfully"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Pending",
+                "to_state": "Cancelled",
+                "event": "cancel",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "cancel",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "log",
+                          "message": "Order cancelled"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "relationships": [
+        {
+          "name": "R1",
+          "type": "one_to_many",
+          "from_class": "Customer",
+          "to_class": "Order",
+          "from_domain": "Product Domain",
+          "to_domain": "Product Domain",
+          "description": "Customer places many Orders"
+        }
+      ]
+    }
+  ]
+}
