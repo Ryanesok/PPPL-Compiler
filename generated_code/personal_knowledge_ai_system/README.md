@@ -15,6 +15,10 @@ python main.py
 
 ## Generated Files
 
+- ParkingSlot
+- Account
+- Transaction
+- Customer
 - Message
 - ChatView
 - ApiClient

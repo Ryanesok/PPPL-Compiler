@@ -88,6 +88,10 @@ class CodeGenerator(ABC):
     
     def generate_project(self, parser) -> List[str]:
         """Generate complete project from parsed model"""
+        # Store parser reference for relationship lookups
+        if hasattr(self, 'parser'):
+            self.parser = parser
+        
         # Clean old output first (once at the start)
         self.clean_output_dir()
         

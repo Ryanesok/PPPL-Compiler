@@ -1,13 +1,13 @@
 # Banking System
 **Version**: 1.0.0
-**Generated**: 2025-12-22 15:14:14
+**Generated**: 2025-12-28 06:41:05
 
 ---
 
 ## Architecture Overview
 
 - **Total Domains**: 1
-- **Total Classes**: 3
+- **Total Classes**: 4
 - **Total Relationships**: 1
 
 ## Domains
@@ -25,6 +25,30 @@ Domain untuk sistem perbankan
 ---
 
 ## Class Reference
+
+### ParkingSlot
+
+**Type**: class
+
+Representasi fisik tempat parkir
+
+**Attributes**:
+
+| Name | Type | Description |
+|------|------|-------------|
+| `SlotID` | uuid | - |
+| `SlotNumber` | string | - |
+| `Status` | state | - |
+
+**Methods**:
+
+- `parkvehicle()`: Transition from *Available* to *Occupied*
+
+**Auto-generated Methods**:
+
+- `__str__()`: String representation
+- `to_dict()`: Serialize to dictionary
+- `validate()`: Validate instance data
 
 ### Account
 
@@ -128,6 +152,21 @@ Account has many Transactions
 
 ## State Machines
 
+### ParkingSlot State Machine
+
+**Initial State**: Available
+
+**States**:
+
+- **Available**: No description
+- **Occupied**: No description
+
+**State Transitions**:
+
+```
+Available --[parkVehicle]--> Occupied
+```
+
 ### Account State Machine
 
 **Initial State**: Pending
@@ -177,8 +216,9 @@ Completed --[reverse]--> Reversed
 
 | Class | Initial State | Available Events |
 |-------|---------------|------------------|
-| **Account** | Pending | `approve`, `freeze`, `unfreeze` (+1 more) |
-| **Transaction** | Pending | `fail`, `reverse`, `process` (+1 more) |
+| **ParkingSlot** | Available | `parkVehicle` |
+| **Account** | Pending | `freeze`, `approve`, `close` (+1 more) |
+| **Transaction** | Pending | `process`, `complete`, `reverse` (+1 more) |
 
 ---
 
@@ -189,12 +229,12 @@ Completed --[reverse]--> Reversed
 ```python
 from library import *
 
-# Create Account instance
-obj = Account()
+# Create ParkingSlot instance
+obj = ParkingSlot()
 print(obj.Status)
 
-# Trigger event: approve
-obj.approve()
+# Trigger event: parkVehicle
+obj.parkvehicle()
 print(obj.Status)
 
 # Validate and serialize

@@ -27,10 +27,15 @@ class Transaction:
     Timestamp: Optional[datetime] = None
     Status: 'TransactionState' = field(default_factory=lambda: TransactionState.PENDING)
 
+    # Relationships
+    account: Optional['Account'] = None  # R2 (inverse): Account has many Transactions
+
 
     def process(self):
         """Handle process event"""
         if self.Status == TransactionState.PENDING:
+            print(f"[LOG] Processing transaction {self.TransactionID}")
+            Account(self.Amount)
             self.Status = TransactionState.PROCESSING
             return True
         return False
@@ -38,6 +43,8 @@ class Transaction:
     def complete(self):
         """Handle complete event"""
         if self.Status == TransactionState.PROCESSING:
+            print(f"[LOG] Transaction completed successfully")
+            Account(self.Amount)
             self.Status = TransactionState.COMPLETED
             return True
         return False
@@ -45,6 +52,7 @@ class Transaction:
     def fail(self):
         """Handle fail event"""
         if self.Status == TransactionState.PROCESSING:
+            print(f"[LOG] Transaction failed: {errorMessage}")
             self.Status = TransactionState.FAILED
             return True
         return False
@@ -52,6 +60,8 @@ class Transaction:
     def reverse(self):
         """Handle reverse event"""
         if self.Status == TransactionState.COMPLETED:
+            print(f"[LOG] Reversing transaction")
+            Account(self.Amount)
             self.Status = TransactionState.REVERSED
             return True
         return False

@@ -60,6 +60,26 @@ class ModelParser:
     def get_relationships(self) -> Dict:
         return self.relationships
     
+    def get_relationships_for_class(self, class_name: str, domain_name: str = None) -> List[Dict]:
+        """Get all relationships involving a specific class"""
+        result = []
+        
+        for domain in self.domains:
+            # Filter by domain if specified
+            if domain_name and domain.get('name') != domain_name:
+                continue
+            
+            if 'relationships' in domain:
+                for rel in domain['relationships']:
+                    from_class = rel.get('from_class', '')
+                    to_class = rel.get('to_class', '')
+                    
+                    # Include if this class is involved in the relationship
+                    if from_class == class_name or to_class == class_name:
+                        result.append(rel)
+        
+        return result
+    
     def validate(self) -> tuple[bool, List[str]]:
         """Validate model structure"""
         errors = []

@@ -39,6 +39,9 @@ class Answer:
     def searchrelevantdocs(self):
         """Handle searchRelevantDocs event"""
         if self.Status == AnswerState.RECEIVED:
+            # Unknown action type: update
+            DocumentRetriever("this.QueryText")
+            print(f"[LOG] Retrieving context for answer {self.AnswerID}.")
             self.Status = AnswerState.RETRIEVINGCONTEXT
             return True
         return False
@@ -46,6 +49,8 @@ class Answer:
     def docsretrieved(self):
         """Handle docsRetrieved event"""
         if self.Status == AnswerState.RETRIEVINGCONTEXT:
+            # Unknown action type: update
+            # Unknown action type: update
             self.Status = AnswerState.CONTEXTFOUND
             return True
         return False
@@ -53,6 +58,8 @@ class Answer:
     def nodocsfound(self):
         """Handle noDocsFound event"""
         if self.Status == AnswerState.RETRIEVINGCONTEXT:
+            # Unknown action type: update
+            print(f"[LOG] No context found for answer {self.AnswerID}.")
             self.Status = AnswerState.NOCONTEXT
             return True
         return False
@@ -60,6 +67,8 @@ class Answer:
     def prepareprompt(self):
         """Handle preparePrompt event"""
         if self.Status == AnswerState.CONTEXTFOUND:
+            # Unknown action type: update
+            PromptBuilder("this.QueryText", "this.Sources")
             self.Status = AnswerState.BUILDINGPROMPT
             return True
         return False
@@ -67,6 +76,8 @@ class Answer:
     def usefallbackprompt(self):
         """Handle useFallbackPrompt event"""
         if self.Status == AnswerState.NOCONTEXT:
+            # Unknown action type: update
+            PromptBuilder("this.QueryText")
             self.Status = AnswerState.BUILDINGPROMPT
             return True
         return False
@@ -74,6 +85,8 @@ class Answer:
     def sendtollm(self):
         """Handle sendToLLM event"""
         if self.Status == AnswerState.BUILDINGPROMPT:
+            # Unknown action type: update
+            LLMClient("${prompt}")
             self.Status = AnswerState.GENERATINGANSWER
             return True
         return False
@@ -81,6 +94,7 @@ class Answer:
     def startstreaming(self):
         """Handle startStreaming event"""
         if self.Status == AnswerState.GENERATINGANSWER:
+            # Unknown action type: update
             self.Status = AnswerState.STREAMING
             return True
         return False
@@ -88,6 +102,8 @@ class Answer:
     def chunksreceived(self):
         """Handle chunksReceived event"""
         if self.Status == AnswerState.STREAMING:
+            # Unknown action type: append
+            # Unknown action type: update
             self.Status = AnswerState.PARTIALANSWER
             return True
         return False
@@ -95,6 +111,7 @@ class Answer:
     def continuestreaming(self):
         """Handle continueStreaming event"""
         if self.Status == AnswerState.PARTIALANSWER:
+            # Unknown action type: update
             self.Status = AnswerState.STREAMING
             return True
         return False
@@ -102,6 +119,8 @@ class Answer:
     def streamfinished(self):
         """Handle streamFinished event"""
         if self.Status == AnswerState.PARTIALANSWER:
+            # Unknown action type: update
+            print(f"[LOG] Answer {self.AnswerID} generation complete.")
             self.Status = AnswerState.COMPLETE
             return True
         return False
@@ -109,6 +128,8 @@ class Answer:
     def llmerror(self):
         """Handle llmError event"""
         if self.Status == AnswerState.GENERATINGANSWER:
+            # Unknown action type: update
+            print(f"[LOG] LLM error for answer {self.AnswerID}: {errorMessage}")
             self.Status = AnswerState.FAILED
             return True
         return False
@@ -116,6 +137,8 @@ class Answer:
     def retrywithfallback(self):
         """Handle retryWithFallback event"""
         if self.Status == AnswerState.FAILED:
+            # Unknown action type: update
+            print(f"[LOG] Retrying answer {self.AnswerID} with fallback model.")
             self.Status = AnswerState.GENERATINGANSWER
             return True
         return False
@@ -123,6 +146,8 @@ class Answer:
     def maxretriesexceeded(self):
         """Handle maxRetriesExceeded event"""
         if self.Status == AnswerState.FAILED:
+            # Unknown action type: update
+            # Unknown action type: update
             self.Status = AnswerState.ERRORRESPONSE
             return True
         return False
@@ -130,6 +155,8 @@ class Answer:
     def formatanswer(self):
         """Handle formatAnswer event"""
         if self.Status == AnswerState.COMPLETE:
+            # Unknown action type: update
+            ResponseFormatter("this.AnswerText", "this.Sources")
             self.Status = AnswerState.FORMATTINGRESPONSE
             return True
         return False
@@ -137,6 +164,8 @@ class Answer:
     def formattingcomplete(self):
         """Handle formattingComplete event"""
         if self.Status == AnswerState.FORMATTINGRESPONSE:
+            # Unknown action type: update
+            # Unknown action type: update
             self.Status = AnswerState.READYTOSEND
             return True
         return False
@@ -144,6 +173,8 @@ class Answer:
     def delivertouser(self):
         """Handle deliverToUser event"""
         if self.Status == AnswerState.READYTOSEND:
+            # Unknown action type: update
+            print(f"[LOG] Answer {self.AnswerID} sent to user.")
             self.Status = AnswerState.SENT
             return True
         return False
@@ -151,6 +182,7 @@ class Answer:
     def senderrormessage(self):
         """Handle sendErrorMessage event"""
         if self.Status == AnswerState.ERRORRESPONSE:
+            # Unknown action type: update
             self.Status = AnswerState.SENT
             return True
         return False

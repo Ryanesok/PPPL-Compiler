@@ -1,14 +1,14 @@
 # Personal Knowledge AI System
 **Version**: 1.0.0
-**Generated**: 2025-12-22 15:11:54
+**Generated**: 2025-12-28 06:41:48
 
 ---
 
 ## Architecture Overview
 
 - **Total Domains**: 6
-- **Total Classes**: 30
-- **Total Relationships**: 22
+- **Total Classes**: 34
+- **Total Relationships**: 23
 
 ## Domains
 
@@ -87,6 +87,116 @@ No description
 ---
 
 ## Class Reference
+
+### ParkingSlot
+
+**Type**: class
+
+Representasi fisik tempat parkir
+
+**Attributes**:
+
+| Name | Type | Description |
+|------|------|-------------|
+| `SlotID` | uuid | - |
+| `SlotNumber` | string | - |
+| `Status` | state | - |
+
+**Methods**:
+
+- `parkvehicle()`: Transition from *Available* to *Occupied*
+
+**Auto-generated Methods**:
+
+- `__str__()`: String representation
+- `to_dict()`: Serialize to dictionary
+- `validate()`: Validate instance data
+
+### Account
+
+**Type**: class
+
+Rekening bank
+
+**Attributes**:
+
+| Name | Type | Description |
+|------|------|-------------|
+| `AccountID` | uuid | - |
+| `AccountNumber` | string | - |
+| `AccountType` | string | - |
+| `Balance` | decimal | - |
+| `Currency` | string | - |
+| `CreatedDate` | datetime | - |
+| `Status` | state | - |
+
+**Methods**:
+
+- `approve()`: Transition from *Pending* to *Active*
+- `freeze()`: Transition from *Active* to *Frozen*
+- `unfreeze()`: Transition from *Frozen* to *Active*
+- `close()`: Transition from *Active* to *Closed*
+
+**Auto-generated Methods**:
+
+- `__str__()`: String representation
+- `to_dict()`: Serialize to dictionary
+- `validate()`: Validate instance data
+
+### Transaction
+
+**Type**: class
+
+Transaksi keuangan
+
+**Attributes**:
+
+| Name | Type | Description |
+|------|------|-------------|
+| `TransactionID` | uuid | - |
+| `AccountID` | uuid | - |
+| `Type` | string | - |
+| `Amount` | decimal | - |
+| `Description` | text | - |
+| `Timestamp` | datetime | - |
+| `Status` | state | - |
+
+**Methods**:
+
+- `process()`: Transition from *Pending* to *Processing*
+- `complete()`: Transition from *Processing* to *Completed*
+- `fail()`: Transition from *Processing* to *Failed*
+- `reverse()`: Transition from *Completed* to *Reversed*
+
+**Auto-generated Methods**:
+
+- `__str__()`: String representation
+- `to_dict()`: Serialize to dictionary
+- `validate()`: Validate instance data
+
+### Customer
+
+**Type**: class
+
+Nasabah bank
+
+**Attributes**:
+
+| Name | Type | Description |
+|------|------|-------------|
+| `CustomerID` | uuid | - |
+| `FullName` | string | - |
+| `Email` | email | - |
+| `Phone` | string | - |
+| `DateOfBirth` | date | - |
+| `Address` | text | - |
+| `KYCVerified` | boolean | - |
+
+**Auto-generated Methods**:
+
+- `__str__()`: String representation
+- `to_dict()`: Serialize to dictionary
+- `validate()`: Validate instance data
 
 ### Message
 
@@ -744,6 +854,14 @@ Implementasi strategi untuk mendeteksi kesenjangan pengetahuan.
 
 ## Relationships
 
+### Unknown: Unknown ↔ Unknown
+
+**Type**: one_to_many
+
+Account has many Transactions
+
+- **Unknown** [1]  ← **Unknown** [1] 
+
 ### R1: Unknown ↔ Unknown
 
 **Type**: association
@@ -923,6 +1041,62 @@ AnalysisEngine menghasilkan Insight.
 ---
 
 ## State Machines
+
+### ParkingSlot State Machine
+
+**Initial State**: Available
+
+**States**:
+
+- **Available**: No description
+- **Occupied**: No description
+
+**State Transitions**:
+
+```
+Available --[parkVehicle]--> Occupied
+```
+
+### Account State Machine
+
+**Initial State**: Pending
+
+**States**:
+
+- **Pending**: No description
+- **Active**: No description
+- **Frozen**: No description
+- **Closed**: No description
+
+**State Transitions**:
+
+```
+Pending --[approve]--> Active
+Active --[freeze]--> Frozen
+Frozen --[unfreeze]--> Active
+Active --[close]--> Closed
+```
+
+### Transaction State Machine
+
+**Initial State**: Pending
+
+**States**:
+
+- **Pending**: No description
+- **Processing**: No description
+- **Completed**: No description
+- **Failed**: No description
+- **Reversed**: No description
+
+**State Transitions**:
+
+```
+Pending --[process]--> Processing
+Processing --[complete]--> Completed
+Processing --[fail]--> Failed
+Completed --[reverse]--> Reversed
+```
 
 ### Message State Machine
 
@@ -1117,11 +1291,14 @@ Acknowledged --[userActsOnInsight]--> Actioned
 
 | Class | Initial State | Available Events |
 |-------|---------------|------------------|
-| **Message** | Draft | `retry`, `userClicksSend`, `apiCallSuccess` (+3 more) |
-| **IngestionJob** | Created | `workerPicksUp`, `extractionSuccess`, `validationPassed` (+5 more) |
-| **ExtractionResult** | Pending | `extractionComplete`, `storageSuccess`, `storageError` (+9 more) |
-| **Answer** | Received | `preparePrompt`, `sendToLLM`, `useFallbackPrompt` (+14 more) |
-| **Insight** | Analyzing | `userAcknowledges`, `maxRetries`, `checkRelevance` (+18 more) |
+| **ParkingSlot** | Available | `parkVehicle` |
+| **Account** | Pending | `freeze`, `approve`, `close` (+1 more) |
+| **Transaction** | Pending | `process`, `complete`, `reverse` (+1 more) |
+| **Message** | Draft | `networkError`, `apiCallSuccess`, `retry` (+3 more) |
+| **IngestionJob** | Created | `addToQueue`, `validationPassed`, `workerPicksUp` (+5 more) |
+| **ExtractionResult** | Pending | `startExtraction`, `markAsFailed`, `storageError` (+9 more) |
+| **Answer** | Received | `deliverToUser`, `docsRetrieved`, `llmError` (+14 more) |
+| **Insight** | Analyzing | `deliveryFailed`, `retry`, `prepareNotification` (+18 more) |
 
 ---
 
@@ -1132,12 +1309,12 @@ Acknowledged --[userActsOnInsight]--> Actioned
 ```python
 from library import *
 
-# Create Message instance
-obj = Message()
+# Create ParkingSlot instance
+obj = ParkingSlot()
 print(obj.Status)
 
-# Trigger event: userClicksSend
-obj.userclickssend()
+# Trigger event: parkVehicle
+obj.parkvehicle()
 print(obj.Status)
 
 # Validate and serialize

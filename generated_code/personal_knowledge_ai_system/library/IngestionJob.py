@@ -33,6 +33,9 @@ class IngestionJob:
     def addtoqueue(self):
         """Handle addToQueue event"""
         if self.Status == IngestionJobState.CREATED:
+            # Unknown action type: update
+            MessageQueue("this")
+            print(f"[LOG] Job {self.JobID} added to queue.")
             self.Status = IngestionJobState.QUEUED
             return True
         return False
@@ -40,6 +43,8 @@ class IngestionJob:
     def workerpicksup(self):
         """Handle workerPicksUp event"""
         if self.Status == IngestionJobState.QUEUED:
+            # Unknown action type: update
+            print(f"[LOG] Job {self.JobID} picked up by worker {workerID}.")
             self.Status = IngestionJobState.PROCESSING
             return True
         return False
@@ -47,6 +52,8 @@ class IngestionJob:
     def checkintegrity(self):
         """Handle checkIntegrity event"""
         if self.Status == IngestionJobState.PROCESSING:
+            # Unknown action type: update
+            print(f"[LOG] Validating job {self.JobID}.")
             self.Status = IngestionJobState.VALIDATING
             return True
         return False
@@ -54,6 +61,8 @@ class IngestionJob:
     def validationpassed(self):
         """Handle validationPassed event"""
         if self.Status == IngestionJobState.VALIDATING:
+            # Unknown action type: update
+            ExtractionWorker("this")
             self.Status = IngestionJobState.EXTRACTING
             return True
         return False
@@ -61,6 +70,8 @@ class IngestionJob:
     def validationerror(self):
         """Handle validationError event"""
         if self.Status == IngestionJobState.VALIDATING:
+            # Unknown action type: update
+            print(f"[LOG] Job {self.JobID} validation failed: {errorDetails}")
             self.Status = IngestionJobState.FAILED
             return True
         return False
@@ -68,6 +79,9 @@ class IngestionJob:
     def extractionsuccess(self):
         """Handle extractionSuccess event"""
         if self.Status == IngestionJobState.EXTRACTING:
+            # Unknown action type: update
+            NotificationService("this.UserID", "this.JobID")
+            print(f"[LOG] Job {self.JobID} completed successfully.")
             self.Status = IngestionJobState.COMPLETED
             return True
         return False
@@ -75,6 +89,8 @@ class IngestionJob:
     def extractionerror(self):
         """Handle extractionError event"""
         if self.Status == IngestionJobState.EXTRACTING:
+            # Unknown action type: update
+            print(f"[LOG] Job {self.JobID} extraction failed: {errorMessage}")
             self.Status = IngestionJobState.FAILED
             return True
         return False
@@ -82,6 +98,8 @@ class IngestionJob:
     def retryjob(self):
         """Handle retryJob event"""
         if self.Status == IngestionJobState.FAILED:
+            # Unknown action type: increment
+            # Unknown action type: condition
             self.Status = IngestionJobState.QUEUED
             return True
         return False

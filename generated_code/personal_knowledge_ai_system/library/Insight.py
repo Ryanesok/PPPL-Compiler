@@ -48,6 +48,9 @@ class Insight:
     def foundconnections(self):
         """Handle foundConnections event"""
         if self.Status == InsightState.ANALYZING:
+            # Unknown action type: update
+            # Unknown action type: update
+            print(f"[LOG] Pattern detected for insight {self.InsightID}.")
             self.Status = InsightState.PATTERNDETECTED
             return True
         return False
@@ -55,6 +58,8 @@ class Insight:
     def noinsightsfound(self):
         """Handle noInsightsFound event"""
         if self.Status == InsightState.ANALYZING:
+            # Unknown action type: update
+            print(f"[LOG] No patterns found for insight {self.InsightID}.")
             self.Status = InsightState.NOPATTERN
             return True
         return False
@@ -62,6 +67,8 @@ class Insight:
     def calculatepriority(self):
         """Handle calculatePriority event"""
         if self.Status == InsightState.PATTERNDETECTED:
+            # Unknown action type: update
+            PriorityScorer("this.RelatedDocs")
             self.Status = InsightState.SCORING
             return True
         return False
@@ -69,6 +76,9 @@ class Insight:
     def scoreabovethreshold(self):
         """Handle scoreAboveThreshold event"""
         if self.Status == InsightState.SCORING:
+            # Unknown action type: update
+            # Unknown action type: update
+            # Unknown action type: update
             self.Status = InsightState.HIGHPRIORITY
             return True
         return False
@@ -76,6 +86,9 @@ class Insight:
     def scorebelowthreshold(self):
         """Handle scoreBelowThreshold event"""
         if self.Status == InsightState.SCORING:
+            # Unknown action type: update
+            # Unknown action type: update
+            # Unknown action type: update
             self.Status = InsightState.LOWPRIORITY
             return True
         return False
@@ -83,6 +96,7 @@ class Insight:
     def checkrelevance(self):
         """Handle checkRelevance event"""
         if self.Status == InsightState.HIGHPRIORITY:
+            # Unknown action type: update
             self.Status = InsightState.VALIDATING
             return True
         return False
@@ -90,6 +104,8 @@ class Insight:
     def storeforlater(self):
         """Handle storeForLater event"""
         if self.Status == InsightState.LOWPRIORITY:
+            # Unknown action type: update
+            print(f"[LOG] Insight {self.InsightID} queued for later.")
             self.Status = InsightState.QUEUED
             return True
         return False
@@ -97,6 +113,7 @@ class Insight:
     def passesvalidation(self):
         """Handle passesValidation event"""
         if self.Status == InsightState.VALIDATING:
+            # Unknown action type: update
             self.Status = InsightState.VALID
             return True
         return False
@@ -104,6 +121,8 @@ class Insight:
     def notrelevant(self):
         """Handle notRelevant event"""
         if self.Status == InsightState.VALIDATING:
+            # Unknown action type: update
+            print(f"[LOG] Insight {self.InsightID} marked as not relevant.")
             self.Status = InsightState.INVALID
             return True
         return False
@@ -111,6 +130,7 @@ class Insight:
     def preparenotification(self):
         """Handle prepareNotification event"""
         if self.Status == InsightState.VALID:
+            # Unknown action type: update
             self.Status = InsightState.READYTONOTIFY
             return True
         return False
@@ -118,6 +138,8 @@ class Insight:
     def discardinsight(self):
         """Handle discardInsight event"""
         if self.Status == InsightState.INVALID:
+            # Unknown action type: update
+            print(f"[LOG] Insight {self.InsightID} discarded.")
             self.Status = InsightState.DISCARDED
             return True
         return False
@@ -125,6 +147,8 @@ class Insight:
     def sendtouser(self):
         """Handle sendToUser event"""
         if self.Status == InsightState.READYTONOTIFY:
+            # Unknown action type: update
+            NotificationService("this.UserID", "this")
             self.Status = InsightState.NOTIFYING
             return True
         return False
@@ -132,6 +156,7 @@ class Insight:
     def deliverysuccess(self):
         """Handle deliverySuccess event"""
         if self.Status == InsightState.NOTIFYING:
+            # Unknown action type: update
             self.Status = InsightState.SENT
             return True
         return False
@@ -139,6 +164,7 @@ class Insight:
     def deliveryfailed(self):
         """Handle deliveryFailed event"""
         if self.Status == InsightState.NOTIFYING:
+            # Unknown action type: update
             self.Status = InsightState.FAILED
             return True
         return False
@@ -146,6 +172,7 @@ class Insight:
     def retry(self):
         """Handle retry event"""
         if self.Status == InsightState.FAILED:
+            # Unknown action type: update
             self.Status = InsightState.NOTIFYING
             return True
         return False
@@ -153,6 +180,7 @@ class Insight:
     def maxretries(self):
         """Handle maxRetries event"""
         if self.Status == InsightState.FAILED:
+            # Unknown action type: update
             self.Status = InsightState.ABANDONED
             return True
         return False
@@ -160,6 +188,7 @@ class Insight:
     def useropensnotification(self):
         """Handle userOpensNotification event"""
         if self.Status == InsightState.SENT:
+            # Unknown action type: update
             self.Status = InsightState.VIEWED
             return True
         return False
@@ -167,6 +196,7 @@ class Insight:
     def notviewedin7days(self):
         """Handle notViewedIn7Days event"""
         if self.Status == InsightState.SENT:
+            # Unknown action type: update
             self.Status = InsightState.EXPIRED
             return True
         return False
@@ -174,6 +204,7 @@ class Insight:
     def useracknowledges(self):
         """Handle userAcknowledges event"""
         if self.Status == InsightState.VIEWED:
+            # Unknown action type: update
             self.Status = InsightState.ACKNOWLEDGED
             return True
         return False
@@ -181,6 +212,7 @@ class Insight:
     def userdismisses(self):
         """Handle userDismisses event"""
         if self.Status == InsightState.VIEWED:
+            # Unknown action type: update
             self.Status = InsightState.DISMISSED
             return True
         return False
@@ -188,6 +220,7 @@ class Insight:
     def useractsoninsight(self):
         """Handle userActsOnInsight event"""
         if self.Status == InsightState.ACKNOWLEDGED:
+            # Unknown action type: update
             self.Status = InsightState.ACTIONED
             return True
         return False

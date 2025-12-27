@@ -18,6 +18,9 @@ class User:
     ProfileImage: Optional[str] = None
     JoinedDate: Optional[datetime] = None
 
+    # Relationships
+    posts: List['Post'] = field(default_factory=list)  # R1: User creates many Posts
+
 
 
 

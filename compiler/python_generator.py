@@ -11,6 +11,7 @@ class PythonGenerator(CodeGenerator):
         super().__init__(output_dir, options, model_name)
         self.action_compiler = ActionLanguageCompiler("Python")
         self.oal_generator = OALGenerator("Python")
+        self.parser = None  # Will be set during generation
     
     def get_file_extension(self) -> str:
         return ".py"
@@ -49,7 +50,14 @@ class PythonGenerator(CodeGenerator):
             attr_code = self._generate_attribute(attr, class_name, state_machine)
             code.append(f"    {attr_code}")
         
-        if not attributes:
+        # Generate relationship properties
+        relationships = self._get_class_relationships(class_name, domain)
+        rel_code = self._generate_relationships(class_data, relationships)
+        if rel_code:
+            code.append("")
+            code.append(rel_code)
+        
+        if not attributes and not rel_code:
             code.append("    pass")
         
         code.append("\n")
@@ -194,7 +202,19 @@ class PythonGenerator(CodeGenerator):
             for trans in trans_list:
                 from_state = trans.get('from_state', '')
                 to_state = trans.get('to_state', '')
-                actions = trans.get('actions', [])
+                
+                # Extract actions from actionLanguage structure
+                actions = []
+                action_lang = trans.get('actionLanguage', {})
+                if action_lang:
+                    operations = action_lang.get('operations', [])
+                    for operation in operations:
+                        steps = operation.get('steps', [])
+                        actions.extend(steps)
+                
+                # Fallback to old 'actions' field if exists
+                if not actions:
+                    actions = trans.get('actions', [])
                 
                 from_state_var = self._sanitize_identifier(from_state).upper()
                 if not from_state_var:
@@ -205,7 +225,7 @@ class PythonGenerator(CodeGenerator):
                 
                 code.append(f"        if self.Status == {class_name}State.{from_state_var}:")
                 
-                # Execute transition actions
+                # Execute transition actions from OAL
                 if actions:
                     for action in actions:
                         action_code = self.action_compiler.compile_action(action, class_name)
@@ -344,9 +364,55 @@ class PythonGenerator(CodeGenerator):
         
         return "\n".join(code)
     
+    def _generate_relationships(self, class_data: Dict, relationships: List[Dict]) -> str:
+        """Generate relationship properties for a class"""
+        code = []
+        class_name = class_data['name']
+        
+        if not relationships:
+            return ""
+        
+        code.append("    # Relationships")
+        
+        for rel in relationships:
+            rel_type = rel.get('type', '')
+            from_class = rel.get('from_class', '')
+            to_class = rel.get('to_class', '')
+            rel_name = rel.get('name', '')
+            description = rel.get('description', '')
+            
+            # Generate properties based on relationship direction
+            if from_class == class_name:
+                # This class is the source
+                if rel_type == 'one_to_many':
+                    prop_name = f"{to_class.lower()}s"
+                    code.append(f"    {prop_name}: List['{to_class}'] = field(default_factory=list)  # {rel_name}: {description}")
+                elif rel_type == 'one_to_one':
+                    prop_name = f"{to_class.lower()}"
+                    code.append(f"    {prop_name}: Optional['{to_class}'] = None  # {rel_name}: {description}")
+                elif rel_type == 'many_to_many':
+                    prop_name = f"{to_class.lower()}s"
+                    code.append(f"    {prop_name}: List['{to_class}'] = field(default_factory=list)  # {rel_name}: {description}")
+            
+            elif to_class == class_name:
+                # This class is the target
+                if rel_type == 'one_to_many':
+                    # Reverse: many-to-one
+                    prop_name = f"{from_class.lower()}"
+                    code.append(f"    {prop_name}: Optional['{from_class}'] = None  # {rel_name} (inverse): {description}")
+                elif rel_type == 'one_to_one':
+                    prop_name = f"{from_class.lower()}"
+                    code.append(f"    {prop_name}: Optional['{from_class}'] = None  # {rel_name} (inverse): {description}")
+                elif rel_type == 'many_to_many':
+                    prop_name = f"{from_class.lower()}s"
+                    code.append(f"    {prop_name}: List['{from_class}'] = field(default_factory=list)  # {rel_name} (inverse): {description}")
+        
+        return "\n".join(code) if code else ""
+    
     def _get_class_relationships(self, class_name: str, domain: str) -> List[Dict]:
         """Get relationships involving this class"""
-        # This will be populated by parser, for now return empty
+        if self.parser:
+            return self.parser.get_relationships_for_class(class_name, domain)
         return []
     
     def generate_library_init(self, parser) -> str:

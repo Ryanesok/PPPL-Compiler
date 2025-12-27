@@ -26,10 +26,16 @@ class Post:
     ViewCount: int = 0
     Status: 'PostState' = field(default_factory=lambda: PostState.DRAFT)
 
+    # Relationships
+    user: Optional['User'] = None  # R1 (inverse): User creates many Posts
+    comments: List['Comment'] = field(default_factory=list)  # R2: Post has many Comments
+    categorys: List['Category'] = field(default_factory=list)  # R3: Posts belong to many Categories
+
 
     def publish(self):
         """Handle publish event"""
         if self.Status == PostState.DRAFT:
+            print(f"[LOG] Publishing post: {self.Title}")
             self.Status = PostState.PUBLISHED
             return True
         return False
@@ -37,6 +43,7 @@ class Post:
     def archive(self):
         """Handle archive event"""
         if self.Status == PostState.PUBLISHED:
+            print(f"[LOG] Archiving post")
             self.Status = PostState.ARCHIVED
             return True
         return False

@@ -31,6 +31,9 @@ class Message:
     def userclickssend(self):
         """Handle userClicksSend event"""
         if self.Status == MessageState.DRAFT:
+            # Unknown action type: update
+            ApiClient("this.Content")
+            print(f"[LOG] Message {self.MessageID} is being sent.")
             self.Status = MessageState.SENDING
             return True
         return False
@@ -38,6 +41,8 @@ class Message:
     def apicallsuccess(self):
         """Handle apiCallSuccess event"""
         if self.Status == MessageState.SENDING:
+            # Unknown action type: update
+            print(f"[LOG] Message {self.MessageID} sent successfully.")
             self.Status = MessageState.SENT
             return True
         return False
@@ -45,6 +50,8 @@ class Message:
     def networkerror(self):
         """Handle networkError event"""
         if self.Status == MessageState.SENDING:
+            # Unknown action type: update
+            print(f"[LOG] Message {self.MessageID} failed: {errorMessage}")
             self.Status = MessageState.FAILED
             return True
         return False
@@ -52,6 +59,8 @@ class Message:
     def retry(self):
         """Handle retry event"""
         if self.Status == MessageState.FAILED:
+            # Unknown action type: update
+            print(f"[LOG] Retrying message {self.MessageID}.")
             self.Status = MessageState.SENDING
             return True
         return False
@@ -59,6 +68,7 @@ class Message:
     def serverconfirms(self):
         """Handle serverConfirms event"""
         if self.Status == MessageState.SENT:
+            # Unknown action type: update
             self.Status = MessageState.DELIVERED
             return True
         return False
@@ -66,6 +76,7 @@ class Message:
     def userviews(self):
         """Handle userViews event"""
         if self.Status == MessageState.DELIVERED:
+            # Unknown action type: update
             self.Status = MessageState.READ
             return True
         return False

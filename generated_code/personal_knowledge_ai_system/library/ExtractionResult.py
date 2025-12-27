@@ -36,6 +36,8 @@ class ExtractionResult:
     def startextraction(self):
         """Handle startExtraction event"""
         if self.Status == ExtractionResultState.PENDING:
+            # Unknown action type: update
+            print(f"[LOG] Starting extraction for result {self.ResultID}.")
             self.Status = ExtractionResultState.EXTRACTING
             return True
         return False
@@ -43,6 +45,9 @@ class ExtractionResult:
     def extractioncomplete(self):
         """Handle extractionComplete event"""
         if self.Status == ExtractionResultState.EXTRACTING:
+            # Unknown action type: update
+            # Unknown action type: update
+            print(f"[LOG] Text extracted for result {self.ResultID}.")
             self.Status = ExtractionResultState.TEXTEXTRACTED
             return True
         return False
@@ -50,6 +55,7 @@ class ExtractionResult:
     def validatecontent(self):
         """Handle validateContent event"""
         if self.Status == ExtractionResultState.TEXTEXTRACTED:
+            # Unknown action type: update
             self.Status = ExtractionResultState.VALIDATING
             return True
         return False
@@ -57,6 +63,7 @@ class ExtractionResult:
     def contentisvalid(self):
         """Handle contentIsValid event"""
         if self.Status == ExtractionResultState.VALIDATING:
+            # Unknown action type: update
             self.Status = ExtractionResultState.VALID
             return True
         return False
@@ -64,6 +71,8 @@ class ExtractionResult:
     def contentisinvalid(self):
         """Handle contentIsInvalid event"""
         if self.Status == ExtractionResultState.VALIDATING:
+            # Unknown action type: update
+            print(f"[LOG] Content invalid for result {self.ResultID}: {reason}")
             self.Status = ExtractionResultState.INVALID
             return True
         return False
@@ -71,6 +80,7 @@ class ExtractionResult:
     def markasfailed(self):
         """Handle markAsFailed event"""
         if self.Status == ExtractionResultState.INVALID:
+            # Unknown action type: update
             self.Status = ExtractionResultState.FAILED
             return True
         return False
@@ -78,6 +88,8 @@ class ExtractionResult:
     def addmetadata(self):
         """Handle addMetadata event"""
         if self.Status == ExtractionResultState.VALID:
+            # Unknown action type: update
+            # Unknown action type: update
             self.Status = ExtractionResultState.METADATAENRICHED
             return True
         return False
@@ -85,6 +97,7 @@ class ExtractionResult:
     def prepareforstorage(self):
         """Handle prepareForStorage event"""
         if self.Status == ExtractionResultState.METADATAENRICHED:
+            # Unknown action type: update
             self.Status = ExtractionResultState.READYFORSTORAGE
             return True
         return False
@@ -92,6 +105,8 @@ class ExtractionResult:
     def sendtostorage(self):
         """Handle sendToStorage event"""
         if self.Status == ExtractionResultState.READYFORSTORAGE:
+            # Unknown action type: update
+            StorageService("this")
             self.Status = ExtractionResultState.STORING
             return True
         return False
@@ -99,6 +114,8 @@ class ExtractionResult:
     def storagesuccess(self):
         """Handle storageSuccess event"""
         if self.Status == ExtractionResultState.STORING:
+            # Unknown action type: update
+            print(f"[LOG] Result {self.ResultID} stored successfully.")
             self.Status = ExtractionResultState.STORED
             return True
         return False
@@ -106,6 +123,8 @@ class ExtractionResult:
     def storageerror(self):
         """Handle storageError event"""
         if self.Status == ExtractionResultState.STORING:
+            # Unknown action type: update
+            print(f"[LOG] Storage failed for result {self.ResultID}: {errorMessage}")
             self.Status = ExtractionResultState.STORAGEFAILED
             return True
         return False
@@ -113,6 +132,8 @@ class ExtractionResult:
     def retrystorage(self):
         """Handle retryStorage event"""
         if self.Status == ExtractionResultState.STORAGEFAILED:
+            # Unknown action type: update
+            print(f"[LOG] Retrying storage for result {self.ResultID}.")
             self.Status = ExtractionResultState.STORING
             return True
         return False

@@ -17,6 +17,9 @@ class Comment:
     CreatedAt: Optional[datetime] = None
     IsApproved: bool = False
 
+    # Relationships
+    post: Optional['Post'] = None  # R2 (inverse): Post has many Comments
+
 
 
 

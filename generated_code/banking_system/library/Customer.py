@@ -18,6 +18,9 @@ class Customer:
     Address: Optional[str] = None
     KYCVerified: bool = False
 
+    # Relationships
+    accounts: List['Account'] = field(default_factory=list)  # R1: Customer owns many Accounts
+
 
 
 

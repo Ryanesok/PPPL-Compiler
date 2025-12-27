@@ -98,7 +98,11 @@ class ActionLanguageCompiler:
     def _compile_log(self, action: Dict) -> str:
         """Compile log action"""
         message = action.get('message', '')
-        return f'print("[LOG] {message}")'
+        # Handle variable interpolation ${variable} -> {variable}
+        import re
+        # Replace ${self.attr} with {self.attr}
+        message = re.sub(r'\$\{([^}]+)\}', r'{\1}', message)
+        return f'print(f"[LOG] {message}")'  # Use f-string for interpolation
     
     def _compile_transition(self, action: Dict, class_name: str) -> str:
         """Compile state transition"""

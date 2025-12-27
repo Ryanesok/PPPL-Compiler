@@ -26,40 +26,49 @@ class Account:
     CreatedDate: Optional[datetime] = None
     Status: 'AccountState' = field(default_factory=lambda: AccountState.PENDING)
 
+    # Relationships
+    customer: Optional['Customer'] = None  # R1 (inverse): Customer owns many Accounts
+    transactions: List['Transaction'] = field(default_factory=list)  # R2: Account has many Transactions
+
 
     def approve(self):
         """Handle approve event"""
         if self.Status == AccountState.PENDING:
+            print(f"[LOG] Approving account {self.AccountNumber}")
             self.Status = AccountState.ACTIVE
             # On entry Active
-            print("[LOG] Account activated")
+            print(f"[LOG] Account activated")
             return True
         return False
 
     def freeze(self):
         """Handle freeze event"""
         if self.Status == AccountState.ACTIVE:
+            print(f"[LOG] Freezing account due to: {reason}")
             self.Status = AccountState.FROZEN
             # On entry Frozen
-            print("[LOG] Account frozen - no transactions allowed")
+            print(f"[LOG] Account frozen - no transactions allowed")
             return True
         return False
 
     def unfreeze(self):
         """Handle unfreeze event"""
         if self.Status == AccountState.FROZEN:
+            print(f"[LOG] Unfreezing account")
             self.Status = AccountState.ACTIVE
             # On entry Active
-            print("[LOG] Account activated")
+            print(f"[LOG] Account activated")
             return True
         return False
 
     def close(self):
         """Handle close event"""
         if self.Status == AccountState.ACTIVE:
+            self = "0.0"
+            print(f"[LOG] Closing account - balance cleared")
             self.Status = AccountState.CLOSED
             # On entry Closed
-            print("[LOG] Account closed permanently")
+            print(f"[LOG] Account closed permanently")
             return True
         return False
 

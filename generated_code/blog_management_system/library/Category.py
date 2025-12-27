@@ -15,6 +15,9 @@ class Category:
     Description: Optional[str] = None
     Slug: Optional[str] = None
 
+    # Relationships
+    posts: List['Post'] = field(default_factory=list)  # R3 (inverse): Posts belong to many Categories
+
 
 
 
