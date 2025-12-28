@@ -204,20 +204,22 @@
       ],
       "relationships": [
         {
-          "relationship_id": "R1",
-          "description": "ChatView menampilkan Message.",
-          "participants": [
-            { "class_name": "ChatView", "role": "menampilkan", "multiplicity": "1" },
-            { "class_name": "Message", "role": "ditampilkan di", "multiplicity": "0..*" }
-          ]
+          "name": "R1",
+          "type": "one_to_many",
+          "from_class": "ChatView",
+          "to_class": "Message",
+          "from_domain": "User Interface Domain",
+          "to_domain": "User Interface Domain",
+          "description": "ChatView menampilkan Message."
         },
         {
-          "relationship_id": "R2",
-          "description": "ChatView menggunakan ApiClient untuk komunikasi.",
-          "participants": [
-            { "class_name": "ChatView", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "ApiClient", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R2",
+          "type": "one_to_one",
+          "from_class": "ChatView",
+          "to_class": "ApiClient",
+          "from_domain": "User Interface Domain",
+          "to_domain": "User Interface Domain",
+          "description": "ChatView menggunakan ApiClient untuk komunikasi."
         }
       ]
     },
@@ -522,28 +524,31 @@
       ],
       "relationships": [
         {
-          "relationship_id": "R3",
-          "description": "IngestController menggunakan IngestService.",
-          "participants": [
-            { "class_name": "IngestController", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "IngestService", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R3",
+          "type": "one_to_one",
+          "from_class": "IngestController",
+          "to_class": "IngestService",
+          "from_domain": "Ingestion Domain",
+          "to_domain": "Ingestion Domain",
+          "description": "IngestController menggunakan IngestService."
         },
         {
-          "relationship_id": "R4",
-          "description": "IngestService membuat IngestionJob.",
-          "participants": [
-            { "class_name": "IngestService", "role": "membuat", "multiplicity": "1" },
-            { "class_name": "IngestionJob", "role": "dibuat oleh", "multiplicity": "0..*" }
-          ]
+          "name": "R4",
+          "type": "one_to_many",
+          "from_class": "IngestService",
+          "to_class": "IngestionJob",
+          "from_domain": "Ingestion Domain",
+          "to_domain": "Ingestion Domain",
+          "description": "IngestService membuat IngestionJob."
         },
         {
-          "relationship_id": "R5",
-          "description": "IngestionJob dipublikasikan ke MessageQueue.",
-          "participants": [
-            { "class_name": "IngestionJob", "role": "dipublikasikan ke", "multiplicity": "0..*" },
-            { "class_name": "MessageQueue", "role": "menerima", "multiplicity": "1" }
-          ]
+          "name": "R5",
+          "type": "many_to_one",
+          "from_class": "IngestionJob",
+          "to_class": "MessageQueue",
+          "from_domain": "Ingestion Domain",
+          "to_domain": "Ingestion Domain",
+          "description": "IngestionJob dipublikasikan ke MessageQueue."
         }
       ]
     },
@@ -925,28 +930,31 @@
       ],
       "relationships": [
         {
-          "relationship_id": "R6",
-          "description": "ExtractionWorker menggunakan ExtractionFactory.",
-          "participants": [
-            { "class_name": "ExtractionWorker", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "ExtractionFactory", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R6",
+          "type": "one_to_one",
+          "from_class": "ExtractionWorker",
+          "to_class": "ExtractionFactory",
+          "from_domain": "Extraction Domain",
+          "to_domain": "Extraction Domain",
+          "description": "ExtractionWorker menggunakan ExtractionFactory."
         },
         {
-          "relationship_id": "R7",
-          "description": "ExtractionWorker membuat ExtractionResult.",
-          "participants": [
-            { "class_name": "ExtractionWorker", "role": "membuat", "multiplicity": "1" },
-            { "class_name": "ExtractionResult", "role": "dibuat oleh", "multiplicity": "0..*" }
-          ]
+          "name": "R7",
+          "type": "one_to_many",
+          "from_class": "ExtractionWorker",
+          "to_class": "ExtractionResult",
+          "from_domain": "Extraction Domain",
+          "to_domain": "Extraction Domain",
+          "description": "ExtractionWorker membuat ExtractionResult."
         },
         {
-          "relationship_id": "R8",
-          "description": "ExtractionFactory mengelola berbagai extractor strategies.",
-          "participants": [
-            { "class_name": "ExtractionFactory", "role": "mengelola", "multiplicity": "1" },
-            { "class_name": "PdfExtractor", "role": "dikelola oleh", "multiplicity": "0..*" }
-          ]
+          "name": "R8",
+          "type": "one_to_many",
+          "from_class": "ExtractionFactory",
+          "to_class": "PdfExtractor",
+          "from_domain": "Extraction Domain",
+          "to_domain": "Extraction Domain",
+          "description": "ExtractionFactory mengelola berbagai extractor strategies."
         }
       ]
     },
@@ -996,28 +1004,31 @@
       ],
       "relationships": [
         {
-          "relationship_id": "R9",
-          "description": "StorageService menggunakan EmbeddingGenerator.",
-          "participants": [
-            { "class_name": "StorageService", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "EmbeddingGenerator", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R9",
+          "type": "one_to_one",
+          "from_class": "StorageService",
+          "to_class": "EmbeddingGenerator",
+          "from_domain": "Storage Domain",
+          "to_domain": "Storage Domain",
+          "description": "StorageService menggunakan EmbeddingGenerator."
         },
         {
-          "relationship_id": "R10",
-          "description": "StorageService menggunakan VectorClient.",
-          "participants": [
-            { "class_name": "StorageService", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "VectorClient", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R10",
+          "type": "one_to_one",
+          "from_class": "StorageService",
+          "to_class": "VectorClient",
+          "from_domain": "Storage Domain",
+          "to_domain": "Storage Domain",
+          "description": "StorageService menggunakan VectorClient."
         },
         {
-          "relationship_id": "R11",
-          "description": "StorageService menggunakan MetadataClient.",
-          "participants": [
-            { "class_name": "StorageService", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "MetadataClient", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R11",
+          "type": "one_to_one",
+          "from_class": "StorageService",
+          "to_class": "MetadataClient",
+          "from_domain": "Storage Domain",
+          "to_domain": "Storage Domain",
+          "description": "StorageService menggunakan MetadataClient."
         }
       ]
     },
@@ -1540,48 +1551,63 @@
             { "name": "ClientID", "data_type": "uuid", "attribute_type": "naming" },
             { "name": "ModelName", "data_type": "string", "attribute_type": "descriptive" }
           ]
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "ResponseFormatter",
+          "key_letter": "RFM",
+          "description": "Service untuk memformat response AI ke format yang sesuai.",
+          "attributes": [
+            { "name": "FormatterID", "data_type": "uuid", "attribute_type": "naming" },
+            { "name": "FormatType", "data_type": "string", "attribute_type": "descriptive" }
+          ]
         }
       ],
       "relationships": [
         {
-          "relationship_id": "R12",
-          "description": "QueryController menggunakan RAGService.",
-          "participants": [
-            { "class_name": "QueryController", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "RAGService", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R12",
+          "type": "one_to_one",
+          "from_class": "QueryController",
+          "to_class": "RAGService",
+          "from_domain": "AI Core Domain",
+          "to_domain": "AI Core Domain",
+          "description": "QueryController menggunakan RAGService."
         },
         {
-          "relationship_id": "R13",
-          "description": "RAGService membuat Answer.",
-          "participants": [
-            { "class_name": "RAGService", "role": "membuat", "multiplicity": "1" },
-            { "class_name": "Answer", "role": "dibuat oleh", "multiplicity": "0..*" }
-          ]
+          "name": "R13",
+          "type": "one_to_many",
+          "from_class": "RAGService",
+          "to_class": "Answer",
+          "from_domain": "AI Core Domain",
+          "to_domain": "AI Core Domain",
+          "description": "RAGService membuat Answer."
         },
         {
-          "relationship_id": "R14",
-          "description": "RAGService menggunakan DocumentRetriever.",
-          "participants": [
-            { "class_name": "RAGService", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "DocumentRetriever", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R14",
+          "type": "one_to_one",
+          "from_class": "RAGService",
+          "to_class": "DocumentRetriever",
+          "from_domain": "AI Core Domain",
+          "to_domain": "AI Core Domain",
+          "description": "RAGService menggunakan DocumentRetriever."
         },
         {
-          "relationship_id": "R15",
-          "description": "RAGService menggunakan PromptBuilder.",
-          "participants": [
-            { "class_name": "RAGService", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "PromptBuilder", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R15",
+          "type": "one_to_one",
+          "from_class": "RAGService",
+          "to_class": "PromptBuilder",
+          "from_domain": "AI Core Domain",
+          "to_domain": "AI Core Domain",
+          "description": "RAGService menggunakan PromptBuilder."
         },
         {
-          "relationship_id": "R16",
-          "description": "RAGService menggunakan LLMClient.",
-          "participants": [
-            { "class_name": "RAGService", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "LLMClient", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R16",
+          "type": "one_to_one",
+          "from_class": "RAGService",
+          "to_class": "LLMClient",
+          "from_domain": "AI Core Domain",
+          "to_domain": "AI Core Domain",
+          "description": "RAGService menggunakan LLMClient."
         }
       ]
     },
@@ -2193,52 +2219,58 @@
       ],
       "relationships": [
         {
-          "relationship_id": "R17",
-          "description": "ProactiveWorker menggunakan AnalysisEngine.",
-          "participants": [
-            { "class_name": "ProactiveWorker", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "AnalysisEngine", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R17",
+          "type": "one_to_one",
+          "from_class": "ProactiveWorker",
+          "to_class": "AnalysisEngine",
+          "from_domain": "Proactive Analysis Domain",
+          "to_domain": "Proactive Analysis Domain",
+          "description": "ProactiveWorker menggunakan AnalysisEngine."
         },
         {
-          "relationship_id": "R18",
-          "description": "ProactiveWorker menggunakan NotificationService.",
-          "participants": [
-            { "class_name": "ProactiveWorker", "role": "menggunakan", "multiplicity": "1" },
-            { "class_name": "NotificationService", "role": "digunakan oleh", "multiplicity": "1" }
-          ]
+          "name": "R18",
+          "type": "one_to_one",
+          "from_class": "ProactiveWorker",
+          "to_class": "NotificationService",
+          "from_domain": "Proactive Analysis Domain",
+          "to_domain": "Proactive Analysis Domain",
+          "description": "ProactiveWorker menggunakan NotificationService."
         },
         {
-          "relationship_id": "R19",
-          "description": "AnalysisEngine mengelola IAnalysisStrategy.",
-          "participants": [
-            { "class_name": "AnalysisEngine", "role": "mengelola", "multiplicity": "1" },
-            { "class_name": "IAnalysisStrategy", "role": "dikelola oleh", "multiplicity": "0..*" }
-          ]
+          "name": "R19",
+          "type": "one_to_many",
+          "from_class": "AnalysisEngine",
+          "to_class": "IAnalysisStrategy",
+          "from_domain": "Proactive Analysis Domain",
+          "to_domain": "Proactive Analysis Domain",
+          "description": "AnalysisEngine mengelola IAnalysisStrategy."
         },
         {
-          "relationship_id": "R20",
-          "description": "ConnectionFinder adalah implementasi dari IAnalysisStrategy.",
-          "participants": [
-            { "class_name": "IAnalysisStrategy", "role": "interface", "multiplicity": "1" },
-            { "class_name": "ConnectionFinder", "role": "implementasi", "multiplicity": "1" }
-          ]
+          "name": "R20",
+          "type": "one_to_one",
+          "from_class": "IAnalysisStrategy",
+          "to_class": "ConnectionFinder",
+          "from_domain": "Proactive Analysis Domain",
+          "to_domain": "Proactive Analysis Domain",
+          "description": "ConnectionFinder adalah implementasi dari IAnalysisStrategy."
         },
         {
-          "relationship_id": "R21",
-          "description": "GapDetector adalah implementasi dari IAnalysisStrategy.",
-          "participants": [
-            { "class_name": "IAnalysisStrategy", "role": "interface", "multiplicity": "1" },
-            { "class_name": "GapDetector", "role": "implementasi", "multiplicity": "1" }
-          ]
+          "name": "R21",
+          "type": "one_to_one",
+          "from_class": "IAnalysisStrategy",
+          "to_class": "GapDetector",
+          "from_domain": "Proactive Analysis Domain",
+          "to_domain": "Proactive Analysis Domain",
+          "description": "GapDetector adalah implementasi dari IAnalysisStrategy."
         },
         {
-          "relationship_id": "R22",
-          "description": "AnalysisEngine menghasilkan Insight.",
-          "participants": [
-            { "class_name": "AnalysisEngine", "role": "menghasilkan", "multiplicity": "1" },
-            { "class_name": "Insight", "role": "dihasilkan oleh", "multiplicity": "0..*" }
-          ]
+          "name": "R22",
+          "type": "one_to_many",
+          "from_class": "AnalysisEngine",
+          "to_class": "Insight",
+          "from_domain": "Proactive Analysis Domain",
+          "to_domain": "Proactive Analysis Domain",
+          "description": "AnalysisEngine menghasilkan Insight."
         }
       ]
     }

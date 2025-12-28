@@ -55,11 +55,13 @@ class ModelParser:
             domain_key = domain.get('key_letter', '')
             if 'relationships' in domain:
                 for rel in domain['relationships']:
-                    rel_id = rel.get('relationship_id', '')
-                    self.relationships[rel_id] = {
-                        'domain': domain['name'],
-                        'relationship': rel
-                    }
+                    # Support both old (relationship_id) and new (name) formats
+                    rel_id = rel.get('name', rel.get('relationship_id', ''))
+                    if rel_id:  # Only add if ID exists
+                        self.relationships[rel_id] = {
+                            'domain': domain['name'],
+                            'relationship': rel
+                        }
     
     def get_domains(self) -> List[Dict]:
         return self.domains
