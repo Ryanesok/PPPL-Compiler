@@ -417,15 +417,60 @@ class CompilerGUI:
         self.log_message("Console cleared.")
     
     def save_log(self):
-        filename = filedialog.asksaveasfilename(
-            title="Save Log File",
-            defaultextension=".txt",
-            filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")]
-        )
-        if filename:
-            with open(filename, 'w', encoding='utf-8') as f:
+        """Save log dengan auto-naming: nama_model-log.txt"""
+        # Ambil nama model dari last compiled atau selected model
+        model_name = None
+        if self.last_compiled_model_dir:
+            # Ambil nama folder terakhir dari path
+            model_name = os.path.basename(self.last_compiled_model_dir)
+        elif self.selected_model.get():
+            # Gunakan selected model
+            model_name = self.selected_model.get()
+        
+        if not model_name:
+            messagebox.showwarning("Warning", "No model compiled or selected.\nPlease compile a model first.")
+            return
+        
+        # Buat nama file log
+        logs_dir = os.path.join(os.path.dirname(__file__), "logs")
+        os.makedirs(logs_dir, exist_ok=True)
+        
+        base_filename = f"{model_name}-log.txt"
+        log_filepath = os.path.join(logs_dir, base_filename)
+        
+        # Cek jika file sudah ada
+        if os.path.exists(log_filepath):
+            # Tanya user: replace atau buat duplikat
+            response = messagebox.askyesnocancel(
+                "File Already Exists",
+                f"Log file '{base_filename}' already exists.\n\n" +
+                "Yes = Replace existing file\n" +
+                "No = Create duplicate with version suffix (v2, v3, etc.)\n" +
+                "Cancel = Abort save"
+            )
+            
+            if response is None:  # Cancel
+                return
+            elif response is False:  # No - create duplicate
+                # Cari versi yang belum ada
+                version = 2
+                while True:
+                    versioned_filename = f"{model_name}-log-v{version}.txt"
+                    versioned_filepath = os.path.join(logs_dir, versioned_filename)
+                    if not os.path.exists(versioned_filepath):
+                        log_filepath = versioned_filepath
+                        break
+                    version += 1
+            # Jika Yes, gunakan log_filepath yang sudah ada (akan di-replace)
+        
+        # Simpan log
+        try:
+            with open(log_filepath, 'w', encoding='utf-8') as f:
                 f.write(self.console.get(1.0, tk.END))
-            self.log_message(f"Log saved to: {filename}")
+            self.log_message(f"Log saved to: {log_filepath}")
+            messagebox.showinfo("Success", f"Log saved to:\n{os.path.basename(log_filepath)}")
+        except Exception as e:
+            messagebox.showerror("Error", f"Failed to save log:\n{str(e)}")
     
     def _run_test(self):
         """Internal test run method (auto-called after compile)"""
