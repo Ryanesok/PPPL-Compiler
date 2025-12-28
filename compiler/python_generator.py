@@ -24,14 +24,43 @@ class PythonGenerator(CodeGenerator):
         attributes = class_data.get('attributes', [])
         state_machine = class_data.get('state_machine', None)
         
+        # Clear referenced classes before compiling this class
+        self.action_compiler.clear_referenced_classes()
+        
+        # Set valid classes from parser (for validation)
+        if self.parser:
+            existing_classes = set(cls_info['class']['name'] for cls_info in self.parser.get_classes().values())
+            self.action_compiler.set_valid_classes(existing_classes)
+        
         code = []
         
-        # Imports
+        # Imports - standard imports
         code.append("from dataclasses import dataclass, field")
         code.append("from typing import Optional, List")
         code.append("from datetime import datetime")
         code.append("from uuid import uuid4, UUID")
         code.append("from enum import Enum")
+        
+        # Pre-compile state methods to collect referenced classes
+        state_methods_code = ""
+        if state_machine and self.options.get('include_state_machines', True):
+            state_methods_code = self._generate_state_methods(class_name, state_machine)
+        
+        # Get referenced classes from OAL compilation
+        referenced_classes = self.action_compiler.get_referenced_classes()
+        
+        # Filter: only import classes that actually exist in the model
+        valid_imports = []
+        if self.parser:
+            existing_classes = set(cls_info['class']['name'] for cls_info in self.parser.get_classes().values())
+            for ref_class in sorted(referenced_classes):
+                if ref_class != class_name and ref_class in existing_classes:
+                    valid_imports.append(ref_class)
+        
+        # Add imports for valid referenced classes (from same package)
+        for ref_class in valid_imports:
+            code.append(f"from .{ref_class} import {ref_class}")
+        
         code.append("\n")
         
         # Generate state enum if state machine exists
@@ -62,10 +91,9 @@ class PythonGenerator(CodeGenerator):
         
         code.append("\n")
         
-        # Generate methods
-        if state_machine and self.options.get('include_state_machines', True):
-            state_methods = self._generate_state_methods(class_name, state_machine)
-            code.append(state_methods)
+        # Add pre-compiled state methods
+        if state_methods_code:
+            code.append(state_methods_code)
         
         # Generate auto-generated OAL methods
         relationships = self._get_class_relationships(class_name, domain)

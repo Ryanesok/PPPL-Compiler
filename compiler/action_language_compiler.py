@@ -1,4 +1,4 @@
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Set
 
 class ActionLanguageCompiler:
     """Compile action language to executable code"""
@@ -6,6 +6,8 @@ class ActionLanguageCompiler:
     def __init__(self, target_lang: str = "Python"):
         self.target_lang = target_lang
         self.indent_level = 2
+        self.referenced_classes = set()  # Track classes referenced in OAL
+        self.valid_classes = set()  # Classes that exist in the model
         
     def compile_action(self, action: Dict, class_name: str) -> str:
         """Compile a single action to code"""
@@ -46,6 +48,14 @@ class ActionLanguageCompiler:
         else:
             class_name = entity
         
+        # Track referenced class
+        if class_name:
+            self.referenced_classes.add(class_name)
+            # Check if class exists in model
+            if self.valid_classes and class_name not in self.valid_classes:
+                # Comment out creation of non-existent class
+                return f"# TODO: {var_name} = {class_name}()  # Class not defined in model"
+        
         return f"{var_name} = {class_name}()"
     
     def _compile_assign(self, action: Dict) -> str:
@@ -84,6 +94,14 @@ class ActionLanguageCompiler:
             param_str = ', '.join([self._format_param(p) for p in params])
             return f"{obj}.{func}({param_str})"
         else:
+            # Track class if it's a constructor call (capitalized name)
+            if target and target[0].isupper() and target not in ['True', 'False', 'None']:
+                self.referenced_classes.add(target)
+                # Check if class exists in model
+                if self.valid_classes and target not in self.valid_classes:
+                    # Comment out call to non-existent class
+                    param_str = ', '.join([self._format_param(p) for p in params])
+                    return f"# TODO: {target}({param_str})  # Class not defined in model"
             param_str = ', '.join([self._format_param(p) for p in params])
             return f"{target}({param_str})"
     
@@ -139,3 +157,15 @@ class ActionLanguageCompiler:
                     result['on_exit'].append(code)
         
         return result
+    
+    def get_referenced_classes(self) -> Set[str]:
+        """Get all classes referenced in compiled OAL"""
+        return self.referenced_classes.copy()
+    
+    def clear_referenced_classes(self):
+        """Clear tracked referenced classes"""
+        self.referenced_classes.clear()
+    
+    def set_valid_classes(self, classes: Set[str]):
+        """Set list of classes that exist in the model"""
+        self.valid_classes = classes
