@@ -1,0 +1,208 @@
+{
+  "system_name": "Your System Name",
+  "version": "1.0.0",
+  "description": "Brief description of your system",
+  "domains": [
+    {
+      "name": "Example Domain",
+      "key_letter": "EXD",
+      "description": "Domain untuk mengelompokkan class yang berhubungan",
+      "classes": [
+        {
+          "entity_type": "class",
+          "name": "ExampleActiveClass",
+          "key_letter": "EAC",
+          "description": "Class dengan state machine (Active Class)",
+          "attributes": [
+            {
+              "name": "ID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Name",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            },
+            {
+              "name": "Status",
+              "data_type": "state",
+              "attribute_type": "descriptive",
+              "default_value": "Created"
+            }
+          ],
+          "state_machine": {
+            "initial_state": "Created",
+            "states": [
+              { "name": "Created" },
+              { "name": "Active" },
+              { "name": "Completed" }
+            ],
+            "transitions": [
+              {
+                "from_state": "Created",
+                "to_state": "Active",
+                "event": "start",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "start",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "self",
+                          "attribute": "Status",
+                          "value": "Active"
+                        },
+                        {
+                          "type": "log",
+                          "message": "Object ${self.ID} started."
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "from_state": "Active",
+                "to_state": "Completed",
+                "event": "finish",
+                "actionLanguage": {
+                  "operations": [
+                    {
+                      "name": "finish",
+                      "parameters": [],
+                      "steps": [
+                        {
+                          "type": "update",
+                          "target": "self",
+                          "attribute": "Status",
+                          "value": "Completed"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        },
+        {
+          "entity_type": "passive_class",
+          "name": "ExamplePassiveClass",
+          "key_letter": "EPC",
+          "description": "Class tanpa state machine (Passive Class) - untuk data dan service",
+          "attributes": [
+            {
+              "name": "ServiceID",
+              "data_type": "uuid",
+              "attribute_type": "naming"
+            },
+            {
+              "name": "Configuration",
+              "data_type": "string",
+              "attribute_type": "descriptive"
+            }
+          ]
+        }
+      ],
+      "relationships": [
+        {
+          "name": "R1",
+          "type": "one_to_many",
+          "from_class": "ExampleActiveClass",
+          "to_class": "ExamplePassiveClass",
+          "from_domain": "Example Domain",
+          "to_domain": "Example Domain",
+          "description": "ExampleActiveClass menggunakan ExamplePassiveClass."
+        }
+      ]
+    }
+  ],
+  "_PETUNJUK_PENGGUNAAN": {
+    "1_SYSTEM_INFO": {
+      "system_name": "Nama sistem Anda - akan menjadi nama folder output",
+      "version": "Versi sistem (semver: major.minor.patch)",
+      "description": "Deskripsi singkat sistem"
+    },
+    "2_DOMAINS": {
+      "info": "Domain = pengelompokan logical dari class-class yang berhubungan",
+      "name": "Nama domain (contoh: User Management, Payment Processing)",
+      "key_letter": "2-3 huruf uppercase unik (contoh: USR, PAY, ORD)",
+      "description": "Penjelasan tujuan domain"
+    },
+    "3_CLASSES": {
+      "entity_type": [
+        "class - untuk passive class (tanpa state machine)",
+        "class dengan state_machine - untuk active class (dengan behavior)"
+      ],
+      "name": "Nama class dalam PascalCase (contoh: User, Order, Payment)",
+      "key_letter": "2-3 huruf uppercase unik dalam domain (contoh: USR, ORD, PAY)",
+      "description": "Penjelasan tujuan dan tanggung jawab class"
+    },
+    "4_ATTRIBUTES": {
+      "name": "Nama attribute dalam PascalCase (contoh: UserID, FullName, CreatedAt)",
+      "data_type": [
+        "uuid - untuk identifier unik",
+        "string - untuk teks",
+        "integer - untuk angka bulat",
+        "float - untuk angka desimal",
+        "boolean - untuk true/false",
+        "datetime - untuk tanggal dan waktu",
+        "json - untuk data kompleks",
+        "state - khusus untuk Status di active class"
+      ],
+      "attribute_type": [
+        "naming - untuk identifier/primary key",
+        "descriptive - untuk semua attribute lainnya"
+      ],
+      "default_value": "Optional - nilai default saat object dibuat"
+    },
+    "5_STATE_MACHINE": {
+      "info": "Hanya untuk active class - mendefinisikan lifecycle dan behavior",
+      "initial_state": "State pertama saat object dibuat (harus ada di states)",
+      "states": "List semua state yang mungkin (contoh: Created, Processing, Completed)",
+      "transitions": "Transisi antar state dengan event dan action language"
+    },
+    "6_ACTION_LANGUAGE": {
+      "info": "OAL (Object Action Language) untuk mendefinisikan behavior",
+      "operations": "List operasi yang akan dijalankan",
+      "steps": "Step-by-step actions dalam operasi",
+      "action_types": [
+        "update - mengubah attribute: {type: 'update', target: 'self', attribute: 'Status', value: 'Active'}",
+        "call - memanggil method/class lain: {type: 'call', target: 'ClassName', method: 'methodName', parameters: []}",
+        "log - logging: {type: 'log', message: 'Text with ${self.attribute} interpolation'}",
+        "create - membuat object baru: {type: 'create', entity: 'ClassName', variable: 'varName'}",
+        "select - query objects: {type: 'select', entity: 'ClassName', variable: 'result', where: 'condition'}",
+        "relate - hubungkan objects: {type: 'relate', from: 'self', to: 'object', across: 'R1'}",
+        "if - conditional: {type: 'if', condition: 'self.attribute == value', then: [], else: []}",
+        "return - kembalikan value: {type: 'return', value: 'result'}"
+      ]
+    },
+    "7_RELATIONSHIPS": {
+      "name": "ID relationship (R1, R2, R3, dst)",
+      "type": [
+        "one_to_one - 1:1 relationship",
+        "one_to_many - 1:N relationship",
+        "many_to_one - N:1 relationship",
+        "many_to_many - N:M relationship"
+      ],
+      "from_class": "Nama class sumber",
+      "to_class": "Nama class tujuan",
+      "from_domain": "Domain class sumber",
+      "to_domain": "Domain class tujuan",
+      "description": "Penjelasan hubungan"
+    },
+    "8_TIPS": {
+      "naming": "Gunakan nama yang jelas dan konsisten",
+      "key_letters": "Pastikan key_letter unik dalam scope-nya (domain untuk class, system untuk domain)",
+      "active_vs_passive": "Active class = punya behavior/lifecycle, Passive class = data/service saja",
+      "relationships": "Definisikan di domain yang paling relevan",
+      "state_machine": "Status attribute harus data_type: 'state' dan punya default_value",
+      "action_language": "Gunakan interpolasi ${self.attribute} untuk dynamic values",
+      "testing": "Compile secara berkala untuk validasi struktur"
+    },
+    "9_CONTOH_LENGKAP": "Lihat models/banking-system, models/e-commerce, atau models/blog-system"
+  }
+}
