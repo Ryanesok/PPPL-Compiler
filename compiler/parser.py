@@ -9,9 +9,19 @@ class ModelParser:
         self.domains = []
         self.classes = {}
         self.relationships = {}
+    
+    def reset(self):
+        """Reset parser state for fresh compilation"""
+        self.model = None
+        self.domains = []
+        self.classes = {}
+        self.relationships = {}
         
     def parse_file(self, file_path: str) -> Dict[str, Any]:
         """Load and parse JSON model file"""
+        # Reset state before parsing new file
+        self.reset()
+        
         with open(file_path, 'r', encoding='utf-8') as f:
             self.model = json.load(f)
         

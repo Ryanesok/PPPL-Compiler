@@ -125,10 +125,6 @@ class CompilerGUI:
         button_frame = ttk.Frame(main_frame)
         button_frame.grid(row=13, column=0, columnspan=3, pady=(10, 0))
         
-        ttk.Button(button_frame, text="Test Run", 
-                  command=self.test_run).pack(side=tk.LEFT, padx=5)
-        ttk.Button(button_frame, text="Clear Console", 
-                  command=self.clear_console).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="Save Log", 
                   command=self.save_log).pack(side=tk.LEFT, padx=5)
         ttk.Button(button_frame, text="About", 
@@ -323,6 +319,15 @@ class CompilerGUI:
             messagebox.showwarning("Warning", "Please select an output directory!")
             return
         
+        # Clear console for fresh compilation (Bug Fix #2)
+        self.console.delete(1.0, tk.END)
+        
+        # Reset model analyzer for fresh analysis (Bug Fix #2)
+        self.model_analyzer = ModelAnalyzer()
+        
+        # Reset compiler engine untuk clear state (Bug Fix #1)
+        self.compiler_engine = CompilerEngine()
+        
         self.log_message("-" * 80)
         self.log_message("Starting compilation process...")
         self.log_message(f"Input: {self.input_file.get()}")
@@ -382,7 +387,12 @@ class CompilerGUI:
                 self.log_message(report)
                 
                 self.log_message("-" * 80)
-                messagebox.showinfo("Success", f"Compilation successful!\n{len(generated_files)} files generated.\n\nCheck console for analysis report.")
+                
+                # Auto-run test (Bug Fix: Auto test after compile)
+                self.log_message("")
+                self._run_test()
+                
+                messagebox.showinfo("Success", f"Compilation successful!\n{len(generated_files)} files generated.\n\nCheck console for test results.")
             else:
                 self.log_message("[ERROR] Compilation failed!")
                 for error in self.compiler_engine.get_errors():
@@ -417,14 +427,12 @@ class CompilerGUI:
                 f.write(self.console.get(1.0, tk.END))
             self.log_message(f"Log saved to: {filename}")
     
-    def test_run(self):
-        """Test run the compiled model"""
+    def _run_test(self):
+        """Internal test run method (auto-called after compile)"""
         if not self.last_compiled_model_dir:
-            messagebox.showwarning("Warning", "No compiled model found.\nPlease compile a model first.")
             return
         
         if not os.path.exists(self.last_compiled_model_dir):
-            messagebox.showwarning("Warning", "Compiled model directory not found.\nPlease compile again.")
             return
         
         self.log_message("-" * 80)
